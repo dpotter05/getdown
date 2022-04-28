@@ -1,1 +1,1 @@
-console.log("Hello world!");
+console.log("Be Together slider JavaScript initialized");
