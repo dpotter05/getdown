@@ -29,7 +29,23 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
             $atts, 
             "betogether"
         );
-        $imageURLArray = sanitize_text_field( $atts["image_urls"] );
+        $image_url_array =  betogether_get_array_from_string( sanitize_text_field( $atts["image_urls"] ) );
+        $result = "Found: " . count( $image_url_array );
+        return $result;
+    }
+}
+
+
+if ( !function_exists( 'betogether_get_array_from_string' ) ) {
+    function betogether_get_array_from_string( $string ) {
+        $result = "";
+        if ( !empty( $string ) && is_string( $string ) ) {
+            if ( strpos( $string, "," ) !== false ) {
+                $result = explode( ",", $string );
+            } else {
+                $result = array( $string );
+            }
+        }
         return $result;
     }
 }
