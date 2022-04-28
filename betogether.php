@@ -30,7 +30,50 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
             "betogether"
         );
         $image_url_array =  betogether_get_array_from_string( sanitize_text_field( $atts["image_urls"] ) );
-        $result = "Found: " . count( $image_url_array );
+        $result = betogether_get_html( $image_url_array );
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_get_html' ) ) {
+    function betogether_get_html( $array ) {
+        $result = "";
+        if (!empty( $array ) && is_array( $array ) && count( $array ) > 0) {
+            for ( $i = 0; $i < count( $array ); $i++ ) {
+                $result .= betogether_add_slide_html( $array[$i] );
+            }
+        }
+        $result = betogether_add_slider_container_html( $result );
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_add_slider_container_html' ) ) {
+    function betogether_add_slider_container_html( $slide_html ) {
+        $result = "";
+        if ( !empty( $slide_html ) ) {
+            $result .= <<<HERE
+
+    <div class="betogether-slide-container">
+{$slide_html}
+    </div>
+HERE;
+        }
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_add_slide_html' ) ) {
+    function betogether_add_slide_html( $image_url ) {
+        $result = "";
+        if ( !empty( $image_url ) ) {
+            $result .= <<<HERE
+        <div class="betogether-slide">
+            <img src="{$image_url}" alt="Image Description" />
+        </div>
+
+HERE;
+        }
         return $result;
     }
 }
