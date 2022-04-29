@@ -25,12 +25,18 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
         $atts = shortcode_atts(
             array(
                 "image_urls"  => "",
+                "image_descriptions" => "",
             ), 
             $atts, 
             "betogether"
         );
-        $image_url_array =  betogether_get_array_from_string( ["image_url_string" => $atts["image_urls"]] );
-        $result = betogether_get_html( ["image_url_array" => $image_url_array] );
+        $image_url_array =  betogether_get_array_from_string( ["string" => $atts["image_urls"]] );
+        $image_alt_array =  betogether_get_array_from_string( ["string" => $atts["image_descriptions"]] );
+        $result = betogether_get_html( 
+            [
+                "image_url_array" => $image_url_array,
+                "image_alt_array" => $image_alt_array,
+            ] );
         return $result;
     }
 }
@@ -61,10 +67,17 @@ HERE;
 if ( !function_exists( 'betogether_get_slides' ) ) {
     function betogether_get_slides( $args ) {
         $result = "";
-        $array = ( !empty( $args["image_url_array"] ) ) ? $args["image_url_array"] : "";
-        if (!empty( $array ) && is_array( $array ) && count( $array ) > 0 ) {
-            for ( $i = 0; $i < count( $array ); $i++ ) {
-                $result .= betogether_get_image_tag_and_container( ["image_url" => $array[$i], "count" => $i] );
+        $image_url_array = ( !empty( $args["image_url_array"] ) ) ? $args["image_url_array"] : "";
+        $image_alt_array = ( !empty( $args["image_alt_array"] ) ) ? $args["image_alt_array"] : array();
+        if (!empty( $image_url_array ) && is_array( $image_url_array ) && count( $image_url_array ) > 0 ) {
+            for ( $i = 0; $i < count( $image_url_array ); $i++ ) {
+                $alt = ( !empty( $image_alt_array[$i] ) ) ? $image_alt_array[$i] : "";
+                $result .= betogether_get_image_tag_and_container( 
+                    [
+                        "image_url" => $image_url_array[$i], 
+                        "count" => $i,
+                        "alt" => $alt,
+                    ] );
             }
         }
         return $result;
@@ -75,12 +88,14 @@ if ( !function_exists( 'betogether_get_image_tag_and_container' ) ) {
     function betogether_get_image_tag_and_container( $args ) {
         $result = "";
         $image_url = ( !empty( $args["image_url"] ) && is_string( $args["image_url"] ) ) ? $args["image_url"] : "";
-        $offCSS = ( $args["count"] === 0 ) ? "" : " off";
         if ( !empty( $image_url ) ) {
+            $offCSS = ( $args["count"] === 0 ) ? "" : " off";
+            $count = ( is_numeric( $args["count"] ) ) ? $args["count"] + 1 : "";
             $image_url = trim( esc_url( $image_url ) );
+            $alt = (!empty($args["alt"] ) ) ? trim( sanitize_text_field( $args["alt"] ) ) : "";
             $result .= <<<HERE
-        <div class="betogether-slide{$offCSS}">
-            <img src="{$image_url}" alt="Image Description" />
+        <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}">
+            <img src="{$image_url}" alt="{$alt}" />
         </div>
 
 HERE;
@@ -92,7 +107,7 @@ HERE;
 if ( !function_exists( 'betogether_get_array_from_string' ) ) {
     function betogether_get_array_from_string( $args ) {
         $result = "";
-        $string = ( !empty( $args["image_url_string"] ) && is_string( $args["image_url_string"] ) ) ? sanitize_text_field( $args["image_url_string"] ) : "";
+        $string = ( !empty( $args["string"] ) && is_string( $args["string"] ) ) ? sanitize_text_field( $args["string"] ) : "";
         if ( is_string( $string ) ) {
             if ( strpos( $string, "," ) !== false ) {
                 $result = explode( ",", $string );
