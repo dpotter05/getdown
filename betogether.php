@@ -61,8 +61,7 @@ if ( !function_exists( 'betogether_get_array_from_string' ) ) {
 if ( !function_exists( 'betogether_get_html' ) ) {
     function betogether_get_html( $args ) {
         $slides = betogether_get_slides( $args );
-        //$slide_container = betogether_add_slides_container( $slides );
-        $slide_container = betogether_add_containerX( 
+        $slide_container = betogether_add_container( 
             [
                 'id' => 'betogether-slide-container',
                 'content' => $slides,
@@ -70,16 +69,14 @@ if ( !function_exists( 'betogether_get_html' ) ) {
             ]
         );
         $controls = betogether_get_controls( $args );
-        //$controls_container = betogether_add_controls_container( $controls );
-        $controls_container = betogether_add_containerX( 
+        $controls_container = betogether_add_container( 
             [
                 'id' => 'betogether-controls-container',
                 'content' => $controls,
                 'indent' => 2,
             ]
         );
-        //$slider = betogether_add_container( $slide_container . $controls_container );
-        $slider = betogether_add_containerX( 
+        $slider = betogether_add_container( 
             [
                 'id' => 'betogether-container',
                 'content' => $slide_container . $controls_container,
@@ -131,22 +128,6 @@ HERE;
     }
 }
 
-if ( !function_exists( 'betogether_add_slides_container' ) ) {
-    function betogether_add_slides_container( $slides ) {
-        $result = '';
-        $slides = rtrim( $slides );
-        if ( !empty( $slides ) ) {
-            $result .= <<<HERE
-        <div id="betogether-slide-container">
-{$slides}
-        </div>
-HERE;
-        }
-        return $result;
-    }
-}
-
-
 if ( !function_exists( 'betogether_get_controls' ) ) {
     function betogether_get_controls( $args ) {
         $result = '
@@ -166,39 +147,8 @@ HERE;
     }
 }
 
-if ( !function_exists( 'betogether_add_controls_container' ) ) {
-    function betogether_add_controls_container( $controls ) {
-        $result = '';
-        $controls = rtrim( $controls );
-        if ( !empty( $controls ) ) {
-            $result .= <<<HERE
-
-        <div id="betogether-controls-container">
-{$controls}
-        </div>
-HERE;
-        }
-        return $result;
-    }
-}
-
 if ( !function_exists( 'betogether_add_container' ) ) {
-    function betogether_add_container( $html ) {
-        $result = '';
-        if ( !empty( $html ) ) {
-            $result .= <<<HERE
-
-    <div id="betogether-container">
-{$html}
-    </div>
-HERE;
-        }
-        return $result;
-    }
-}
-
-if ( !function_exists( 'betogether_add_containerX' ) ) {
-    function betogether_add_containerX( $args ) {
+    function betogether_add_container( $args ) {
         $result = '';
         $id = ( !empty( $args['id'] ) ) ? $args['id'] : '';
         $content = ( !empty( $args['content'] ) ) ? rtrim( $args['content'] ) : '';

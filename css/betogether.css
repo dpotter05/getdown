@@ -1,4 +1,6 @@
 div#betogether-container {
+    display:flex;
+    flex-direction:column;
     /*border:2px solid blue;*/
 }
 div#betogether-slide-container {
@@ -11,6 +13,7 @@ div#betogether-slide-container {
     /*background-color:red;*/
 }
 div.betogether-slide {
+    display:flex;
 }
 div.betogether-slide.off {
     display:none;
@@ -48,9 +51,9 @@ a.betogether-control::before {
     position:absolute;
     top:calc(50% - .5 * var(--size));
     left:calc(50% - .5 * var(--size));
-    background-color:#555;
+    background-color:#fff;
     border-radius:50%;
 }
 a.betogether-control[aria-pressed="true"]::before {
-    background-color:#fff;
+    background-color:#555;
 }
