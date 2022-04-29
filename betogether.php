@@ -36,37 +36,64 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
             [
                 'image_url_array' => $image_url_array,
                 'image_alt_array' => $image_alt_array,
-            ] );
+            ]
+        );
+        return $result;
+    }
+}
+
+
+if ( !function_exists( 'betogether_get_array_from_string' ) ) {
+    function betogether_get_array_from_string( $args ) {
+        $result = '';
+        $string = ( !empty( $args['string'] ) && is_string( $args['string'] ) ) ? sanitize_text_field( $args['string'] ) : '';
+        if ( is_string( $string ) ) {
+            if ( strpos( $string, ',' ) !== false ) {
+                $result = explode( ',', $string );
+            } else {
+                $result = array( $string );
+            }
+        }
         return $result;
     }
 }
 
 if ( !function_exists( 'betogether_get_html' ) ) {
     function betogether_get_html( $args ) {
-        $result = betogether_get_slides( $args );
-        $result = betogether_add_slider_container( $result );
-        return $result;
-    }
-}
-
-if ( !function_exists( 'betogether_add_slider_container' ) ) {
-    function betogether_add_slider_container( $slide_html ) {
-        $result = '';
-        if ( !empty( $slide_html ) ) {
-            $result .= <<<HERE
-
-    <div class="betogether-slide-container">
-{$slide_html}
-    </div>
-HERE;
-        }
-        return $result;
+        $slides = betogether_get_slides( $args );
+        //$slide_container = betogether_add_slides_container( $slides );
+        $slide_container = betogether_add_containerX( 
+            [
+                'id' => 'betogether-slide-container',
+                'content' => $slides,
+                'indent' => 2,
+            ]
+        );
+        $controls = betogether_get_controls( $args );
+        //$controls_container = betogether_add_controls_container( $controls );
+        $controls_container = betogether_add_containerX( 
+            [
+                'id' => 'betogether-controls-container',
+                'content' => $controls,
+                'indent' => 2,
+            ]
+        );
+        //$slider = betogether_add_container( $slide_container . $controls_container );
+        $slider = betogether_add_containerX( 
+            [
+                'id' => 'betogether-container',
+                'content' => $slide_container . $controls_container,
+                'indent' => 1,
+            ]
+        );
+        return $slider;
     }
 }
 
 if ( !function_exists( 'betogether_get_slides' ) ) {
     function betogether_get_slides( $args ) {
-        $result = '';
+        $result = '
+';
         $image_url_array = ( !empty( $args['image_url_array'] ) ) ? $args['image_url_array'] : '';
         $image_alt_array = ( !empty( $args['image_alt_array'] ) ) ? $args['image_alt_array'] : array();
         if (!empty( $image_url_array ) && is_array( $image_url_array ) && count( $image_url_array ) > 0 ) {
@@ -94,9 +121,9 @@ if ( !function_exists( 'betogether_get_image_tag_and_container' ) ) {
             $image_url = trim( esc_url( $image_url ) );
             $alt = (!empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
             $result .= <<<HERE
-        <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}">
-            <img src="{$image_url}" alt="{$alt}" />
-        </div>
+            <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}">
+                <img src="{$image_url}" alt="{$alt}" />
+            </div>
 
 HERE;
         }
@@ -104,15 +131,99 @@ HERE;
     }
 }
 
-if ( !function_exists( 'betogether_get_array_from_string' ) ) {
-    function betogether_get_array_from_string( $args ) {
+if ( !function_exists( 'betogether_add_slides_container' ) ) {
+    function betogether_add_slides_container( $slides ) {
         $result = '';
-        $string = ( !empty( $args['string'] ) && is_string( $args['string'] ) ) ? sanitize_text_field( $args['string'] ) : '';
-        if ( is_string( $string ) ) {
-            if ( strpos( $string, ',' ) !== false ) {
-                $result = explode( ',', $string );
-            } else {
-                $result = array( $string );
+        $slides = rtrim( $slides );
+        if ( !empty( $slides ) ) {
+            $result .= <<<HERE
+        <div id="betogether-slide-container">
+{$slides}
+        </div>
+HERE;
+        }
+        return $result;
+    }
+}
+
+
+if ( !function_exists( 'betogether_get_controls' ) ) {
+    function betogether_get_controls( $args ) {
+        $result = '
+';
+        $image_url_array = ( !empty( $args['image_url_array'] ) ) ? $args['image_url_array'] : array();
+        if (!empty( $image_url_array ) && is_array( $image_url_array ) && count( $image_url_array ) > 0 ) {
+            for ( $i = 0; $i < count( $image_url_array ); $i++ ) {
+                $count = $i + 1;
+                $ariaPressed = ( $count === 1 ) ? 'true' : 'false';
+                $result .= <<<HERE
+            <a href="#" id="betogether-control-{$count}" class="betogether-control" role="button" aria-pressed="{$ariaPressed}"></a>
+
+HERE;
+            }
+        }
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_add_controls_container' ) ) {
+    function betogether_add_controls_container( $controls ) {
+        $result = '';
+        $controls = rtrim( $controls );
+        if ( !empty( $controls ) ) {
+            $result .= <<<HERE
+
+        <div id="betogether-controls-container">
+{$controls}
+        </div>
+HERE;
+        }
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_add_container' ) ) {
+    function betogether_add_container( $html ) {
+        $result = '';
+        if ( !empty( $html ) ) {
+            $result .= <<<HERE
+
+    <div id="betogether-container">
+{$html}
+    </div>
+HERE;
+        }
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_add_containerX' ) ) {
+    function betogether_add_containerX( $args ) {
+        $result = '';
+        $id = ( !empty( $args['id'] ) ) ? $args['id'] : '';
+        $content = ( !empty( $args['content'] ) ) ? rtrim( $args['content'] ) : '';
+        $indent = ( !empty( $args['indent'] ) && is_numeric( $args['indent'] ) ) ? $args['indent'] : '';
+        $tab = betogether_get_tab_indentation( $indent );
+        if ( !empty( $content ) ) {
+            $result .= <<<HERE
+
+{$tab}<div id="{$id}">{$content}
+{$tab}</div>
+HERE;
+        }
+        return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_get_tab_indentation' ) ) {
+    function betogether_get_tab_indentation( $tabNumber ) {
+        $result = '';
+        $tab = <<<HERE
+    
+HERE;
+        if ( !empty( $tabNumber ) && is_numeric( $tabNumber )) {
+            for ( $i = 0; $i < $tabNumber; $i++ ) {
+                $result .= $tab;
             }
         }
         return $result;

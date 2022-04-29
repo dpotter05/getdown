@@ -1,17 +1,56 @@
-div.betogether-slide-container {
+div#betogether-container {
+    /*border:2px solid blue;*/
+}
+div#betogether-slide-container {
     height:auto;
     width:100%;
     display:flex;
     align-items:center;
     justify-content:center;
     flex-direction:column;
+    /*background-color:red;*/
 }
- div.betogether-slide {
+div.betogether-slide {
 }
- div.betogether-slide.off {
+div.betogether-slide.off {
     display:none;
 }
- div.betogether-slide img {
+div.betogether-slide img {
     height:auto;
     width:100%;
+}
+div#betogether-controls-container {
+    height:80px;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    /*background-color:rgb(0,0,0,.5);*/
+}
+a.betogether-control {
+    display:block;
+    height:40px;
+    width:40px;
+    border-radius:50%;
+    margin-right:20px;
+    background-color:#111;
+    position:relative;
+}
+a.betogether-control:last-of-type {
+    margin-right:0;
+}
+a.betogether-control::before {
+    --b:4px;
+    --size:calc(100% - 2 * var(--b));
+    content:"";
+    height:var(--size);
+    width:var(--size);
+    position:absolute;
+    top:calc(50% - .5 * var(--size));
+    left:calc(50% - .5 * var(--size));
+    background-color:#555;
+    border-radius:50%;
+}
+a.betogether-control[aria-pressed="true"]::before {
+    background-color:#fff;
 }
