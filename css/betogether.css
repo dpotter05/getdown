@@ -1,59 +1,71 @@
-div#betogether-container {
-    display:flex;
-    flex-direction:column;
-    /*border:2px solid blue;*/
+#betogether-container {
+    display: flex;
+    flex-direction: column;
 }
-div#betogether-slide-container {
-    height:auto;
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    /*background-color:red;*/
+#betogether-slide-container {
+    height: auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
-div.betogether-slide {
-    display:flex;
+.betogether-slide {
+    display: flex;
+    position: relative;
+    left: 0;
+    opacity: 1;
+    animation: betogether-in-from-right .25s ease-out;
 }
-div.betogether-slide.off {
-    display:none;
+@keyframes betogether-in-from-right {
+    0% {
+        left: 30px;
+        opacity: 0;
+    }
+    100% {
+        left: 0;
+        opacity: 1;
+    }
 }
-div.betogether-slide img {
-    height:auto;
-    width:100%;
+.betogether-slide.off {
+    display: none;
 }
-div#betogether-controls-container {
-    height:80px;
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    /*background-color:rgb(0,0,0,.5);*/
+.betogether-slide img {
+    height: auto;
+    width: 100%;
 }
-a.betogether-control {
-    display:block;
-    height:40px;
-    width:40px;
-    border-radius:50%;
-    margin-right:20px;
-    background-color:#111;
-    position:relative;
+#betogether-controls-container {
+    height: 80px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-a.betogether-control:last-of-type {
-    margin-right:0;
+.betogether-control {
+    display: block;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 20px;
+    background-color: #111;
+    position: relative;
 }
-a.betogether-control::before {
-    --b:4px;
-    --size:calc(100% - 2 * var(--b));
-    content:"";
-    height:var(--size);
-    width:var(--size);
-    position:absolute;
-    top:calc(50% - .5 * var(--size));
-    left:calc(50% - .5 * var(--size));
-    background-color:#fff;
-    border-radius:50%;
+.betogether-control: last-of-type {
+    margin-right: 0;
 }
-a.betogether-control[aria-pressed="true"]::before {
-    background-color:#555;
+.betogether-control::before {
+    --b: 4px;
+    --size: calc(100% - 2 * var(--b));
+    content: "";
+    height: var(--size);
+    width: var(--size);
+    position: absolute;
+    top: calc(50% - .5 * var(--size));
+    left: calc(50% - .5 * var(--size));
+    background-color: #fff;
+    border-radius: 50%;
 }
+.betogether-control[aria-pressed="true"]::before {
+    background-color: #555;
+}
+

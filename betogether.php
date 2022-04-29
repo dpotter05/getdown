@@ -136,9 +136,12 @@ if ( !function_exists( 'betogether_get_controls' ) ) {
         if (!empty( $image_url_array ) && is_array( $image_url_array ) && count( $image_url_array ) > 0 ) {
             for ( $i = 0; $i < count( $image_url_array ); $i++ ) {
                 $count = $i + 1;
-                $ariaPressed = ( $count === 1 ) ? 'true' : 'false';
+                $id = 'betogether-control-' . ( $i + 1 );
+                $css_class = 'betogether-control';
+                $aria_pressed = ( $count === 1 ) ? 'true' : 'false';
+                $data_slide = 'betogether-slide-' . $count;
                 $result .= <<<HERE
-            <a href="#" id="betogether-control-{$count}" class="betogether-control" role="button" aria-pressed="{$ariaPressed}"></a>
+            <a href="#" id="{$id}" class="{$css_class}" role="button" aria-pressed="{$aria_pressed}" data-slide="{$data_slide}"></a>
 
 HERE;
             }
