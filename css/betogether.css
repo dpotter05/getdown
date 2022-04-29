@@ -1,0 +1,17 @@
+div.betogether-slide-container {
+    height:auto;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+ div.betogether-slide {
+}
+ div.betogether-slide.off {
+    display:none;
+}
+ div.betogether-slide img {
+    height:auto;
+    width:100%;
+}
