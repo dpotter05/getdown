@@ -1,4 +1,6 @@
-dpTools = {
+/* global betogetherSlideTimer:true */
+
+const dpTools = {
     ns( array ) {
         return ( array !== null && array.length > 0 ) ? true : false;
     },
@@ -41,31 +43,61 @@ dpTools = {
                 }
             });
         }
+    },
+    toggleCSS( element, action, css ) {
+        if ( action === 'add' || action === 'remove' ) {
+          ( ( action === 'add') ? element.classList.add( css ) : element.classList.remove( css ) );
+        } else if (action == 'toggle' ) {
+          element.classList.toggle( css );
+        }
+    },
+    getNextInArray( currentPosition, array ) {
+        currentPosition = Number(currentPosition);
+        return ( currentPosition + 1 <= array.length ) ? currentPosition + 1 : 1;
     }
 };
 
-var betogether = {
-    addListeners: function() {
+const betogether = {
+    getElements( query ) {
+        let array = [];
+        if ( query === 'active slide button' ) {
+            array = document.querySelectorAll( 'a.betogether-slide-button[aria-pressed="true"]' );
+        } else if ( query === 'all slide buttons' ) {
+            array = document.querySelectorAll( 'a.betogether-slide-button' );
+        } else if ( query === 'all slides' ) {
+            array = document.querySelectorAll( 'div.betogether-slide' );
+        } else if ( query === 'active slide' ) {
+            array = document.querySelectorAll( 'div.betogether-slide:not( .off )');
+        }
+        return array;
+    },
+    startSlider() {
+        const activeSlideArray = 
+        betogether.addListeners();
+        betogether.startSlideTimer();
+    },
+    addListeners() {
         betogether.addSlideButtonListeners();
         betogether.addPauseButtonListeners();
     },
-    addSlideButtonListeners: function() {
+    addSlideButtonListeners() {
         dpTools.addAnchorButtonListeners( 'a.betogether-slide-button', betogether, 'slideButtonEvent' );
     },
-    addPauseButtonListeners: function() {
+    addPauseButtonListeners() {
         dpTools.addAnchorButtonListeners( 'a#betogether-pause-button', betogether, 'pauseButtonEvent' );
     },
-    slideButtonEvent: function( e ) {
+    slideButtonEvent( e ) {
         e.preventDefault();
         const button = document.activeElement;
         betogether.runSlideButton( button );
     },
-    pauseButtonEvent: function( e ) {
+    pauseButtonEvent( e ) {
         e.preventDefault();
         dpTools.toggleButton( document.activeElement, 'toggle' );
         console.log( 'Pause' );
+        clearInterval(betogetherSlideTimer);
     },
-    runSlideButton: function( button ) {
+    runSlideButton( button ) {
         const buttonArray = document.querySelectorAll( 'a.betogether-slide-button' );
         if ( dpTools.ns( buttonArray )) {
             buttonArray.forEach(element => {
@@ -79,9 +111,43 @@ var betogether = {
                 }
             });
         }
+    }, startSlideTimer() {
+        const activeSlideArray = betogether.getElements( 'active slide' );
+        if ( dpTools.ns( activeSlideArray ) ) {
+            const totalDuration = Number( activeSlideArray[0].dataset.duration );
+            const nowStamp = Date.now();
+            const start = nowStamp;
+            betogetherSlideTimer = setInterval( function() {
+                let timestamp = Date.now();
+                let elapsedTime = timestamp - start;
+                if (elapsedTime >= totalDuration) {
+                    clearInterval(betogetherSlideTimer);
+                    betogether.nextSlide();
+                }
+            }, 20);
+        }
+    }, nextSlide() {
+        const slideButtonArray = betogether.getElements( 'all slide buttons' );
+        const activeSlideButtonArray = betogether.getElements( 'active slide button' );
+        const slideArray = betogether.getElements( 'all slides' );
+        if ( dpTools.ns( activeSlideButtonArray ) && dpTools.ns( slideButtonArray ) ) {
+            let currentSlideButton = activeSlideButtonArray[0];
+            let currentSlideNumber = ( dpTools.nn( currentSlideButton.dataset.slide ) ) ? Number( currentSlideButton.dataset.slide ) : 1;
+            let nextSlideNumber = dpTools.getNextInArray( currentSlideNumber, slideButtonArray );
+            for (let i = 0; i < slideButtonArray.length; i++) {
+                if ( slideButtonArray[i].id === 'betogether-control-' + nextSlideNumber) {
+                    dpTools.toggleButton( slideButtonArray[i], 'on' );
+                    dpTools.toggleCSS( slideArray[i], 'remove', 'off' );
+                } else {
+                    dpTools.toggleButton( slideButtonArray[i], 'off' );
+                    dpTools.toggleCSS( slideArray[i], 'add', 'off' );
+                }
+            }
+            betogether.startSlideTimer();
+        }
     }
 };
 
 window.onload = function() {
-    betogether.addListeners();
+    betogether.startSlider();
 };

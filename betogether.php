@@ -150,7 +150,7 @@ if ( !function_exists( 'betogether_get_controls' ) ) {
                 $id = 'betogether-control-' . ( $i + 1 );
                 $css_class = 'betogether-slide-button';
                 $aria_pressed = ( $count === 1 ) ? 'true' : 'false';
-                $data_slide = 'betogether-slide-' . $count;
+                $data_slide = $count;
                 $result .= <<<HERE
             <a href="#" id="{$id}" class="{$css_class}" data-slide="{$data_slide}" role="button" aria-pressed="{$aria_pressed}"></a>
 
