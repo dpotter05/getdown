@@ -122,7 +122,6 @@ if ( !function_exists( 'betogether_get_slide' ) ) {
             $count = ( is_numeric( $args['count'] ) ) ? $args['count'] + 1 : '';
             $image_url = trim( esc_url( $image_url ) );
             $alt = ( !empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
-            $message = ( !empty($args['message'] ) ) ? $args['message'] : '';
             $message = ( !empty($args['message'] ) ) ? trim( sanitize_text_field( $args['message'] ) ) : '';
             $result .= <<<HERE
             <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}">

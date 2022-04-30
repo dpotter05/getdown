@@ -48,7 +48,6 @@
     color: white;
     padding: 0.4rem 20px;
     margin: 0;
-    background-color: rgba(0, 0, 0, 0.5);
     background-image: linear-gradient(
         90deg,
         transparent,
@@ -80,7 +79,7 @@
     background-color: #111;
     position: relative;
 }
-.betogether-control: last-of-type {
+.betogether-control:last-of-type {
     margin-right: 0;
 }
 .betogether-control::before {
@@ -107,10 +106,6 @@
         --bt-button-size: 30px;
         --bt-button-y-margin: 14px;
         --bt-button-x-margin: 14px;
-    }
-    .betogether-slide p {
-        font-size: 0.9rem;
-        letter-spacing: 0.05rem;
     }
 }
 
