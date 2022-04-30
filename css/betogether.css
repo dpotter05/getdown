@@ -1,23 +1,23 @@
 #betogether-container {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
     margin:40px auto;
 }
 #betogether-slide-container {
-    height: auto;
-    width: 100%;
-    display: flex;
     align-items: center;
-    justify-content: center;
+    display: flex;
     flex-direction: column;
+    height: auto;
+    justify-content: center;
+    width: 100%;
 }
 .betogether-slide {
+    animation: betogether-in-from-right .25s ease-out;
     display: flex;
-    position: relative;
     left: 0;
     opacity: 1;
-    animation: betogether-in-from-right .25s ease-out;
+    position: relative;
 }
 @keyframes betogether-in-from-right {
     0% {
@@ -37,16 +37,6 @@
     width: 100%;
 }
 .betogether-slide p {
-    width: 80%;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: 1.1rem;
-    font-weight: 900;
-    letter-spacing: 0.2rem;
-    font-family: arial;
-    color: white;
-    padding: 0.4rem 20px;
-    margin: 0;
     background-image: linear-gradient(
         90deg,
         transparent,
@@ -55,45 +45,97 @@
         rgba(0, 0, 0, 0.75),
         transparent
     );
-    position: absolute;
-    top: 10%;
+    box-sizing: border-box;
+    color: white;
+    font-family: arial;
+    font-size: 1.1rem;
+    font-weight: 900;
     left: 10%;
+    letter-spacing: 0.2rem;
+    padding: 0.4rem 20px;
+    position: absolute;
+    margin: 0;
+    text-align: center;
+    top: 10%;
+    width: 80%;
 }
 #betogether-controls-container {
+    --bt-button-border-color: #111;
+    --bt-button-border-width:4px;
+    --bt-button-color: #fff;
+    --bt-button-color-selected: #000;
+    --bt-button-inset-size: calc(100% - 2 * var(--bt-button-border-width));
+    --bt-button-margin-x: 20px;
+    --bt-button-margin-y: 20px;
     --bt-button-size: 40px;
-    --bt-button-y-margin: 20px;
-    --bt-button-x-margin: 20px;
-    height: calc(var(--bt-button-size) + 2 * var(--bt-button-y-margin));
-    width: 100%;
-    display: flex;
     align-items: center;
+    display: flex;
+    height: calc(var(--bt-button-size) + 2 * var(--bt-button-margin-y));
     justify-content: center;
+    width: 100%;
 }
-.betogether-control {
+.betogether-slide-button {
+    background-color: var(--bt-button-border-color);
+    border-radius: 50%;
     display: block;
     height: var(--bt-button-size);
-    width: var(--bt-button-size);
-    border-radius: 50%;
-    margin-right: var(--bt-button-x-margin);
-    background-color: #111;
+    margin-right: var(--bt-button-margin-x);
     position: relative;
+    width: var(--bt-button-size);
 }
-.betogether-control:last-of-type {
-    margin-right: 0;
-}
-.betogether-control::before {
-    --bt-size: calc(100% - 2 * 4px);
+.betogether-slide-button::before {
     content: "";
-    height: var(--bt-size);
-    width: var(--bt-size);
-    position: absolute;
-    top: calc(50% - .5 * var(--bt-size));
-    left: calc(50% - .5 * var(--bt-size));
-    background-color: #fff;
+    background-color: var(--bt-button-color);
     border-radius: 50%;
+    height: var(--bt-button-inset-size);
+    left: calc(50% - .5 * var(--bt-button-inset-size));
+    position: absolute;
+    top: calc(50% - .5 * var(--bt-button-inset-size));
+    width: var(--bt-button-inset-size);
 }
-.betogether-control[aria-pressed="true"]::before {
-    background-color: #000;
+.betogether-slide-button[aria-pressed="true"]::before {
+    background-color: var(--bt-button-color-selected);
+}
+#betogether-pause-button {
+    display: block;
+    background-color: var(--bt-button-border-color);
+    border-radius: calc(.15 * var(--bt-button-size));
+    height: var(--bt-button-size);
+    margin-right: 0;
+    position: relative;
+    width: var(--bt-button-size);
+}
+#betogether-pause-button::before,
+#betogether-pause-button::after {
+    background-color: var(--bt-button-color);
+    border-radius: calc(0.1 * var(--bt-button-size));
+    content: "";
+    height: calc(100% - 2 * var(--bt-button-border-width));
+    position: absolute;
+    top: var(--bt-button-border-width);
+    width: calc(50% - 1.5 * var(--bt-button-border-width));
+}
+#betogether-pause-button::before {
+    left:var(--bt-button-border-width);
+}
+#betogether-pause-button::after {
+    right:var(--bt-button-border-width);
+}
+#betogether-pause-button svg {
+    --bt-pause-button-size: calc(100% - 2 * var(--bt-button-border-width));
+    display: none;
+    height: var(--bt-pause-button-size);
+    left: calc(-6% + var(--bt-button-border-width));
+    position: absolute;
+    top: var(--bt-button-border-width);
+    width: var(--bt-pause-button-size);
+}
+#betogether-pause-button[aria-pressed="true"] svg {
+    display: block;
+}
+#betogether-pause-button[aria-pressed="true"]::before,
+#betogether-pause-button[aria-pressed="true"]::after {
+    display:none;
 }
 
 @media only screen and (max-width:768px) {
@@ -102,9 +144,10 @@
         letter-spacing: 0.05rem;
     }
     #betogether-controls-container {
+        --bt-button-border-width:3px;
+        --bt-button-margin-x: 14px;
+        --bt-button-margin-y: 14px;
         --bt-button-size: 30px;
-        --bt-button-y-margin: 14px;
-        --bt-button-x-margin: 14px;
     }
 }
 
