@@ -27,6 +27,7 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
                 'image_urls' => '',
                 'image_descriptions' => '',
                 'messages' => '',
+                'durations_in_milliseconds' => '',
             ), 
             $atts, 
             'betogether'
@@ -97,6 +98,7 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
         $image_urls = ( !empty( $args['image_urls'] ) ) ? $args['image_urls'] : '';
         $image_descriptions = ( !empty( $args['image_descriptions'] ) ) ? $args['image_descriptions'] : array();
         $messages = ( !empty( $args['messages'] ) ) ? $args['messages'] : array();
+        $durations_in_milliseconds = ( !empty( $args['durations_in_milliseconds'] ) ) ? $args['durations_in_milliseconds'] : array();
         if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
             for ( $i = 0; $i < count( $image_urls ); $i++ ) {
                 $alt = ( !empty( $image_descriptions[$i] ) ) ? $image_descriptions[$i] : '';
@@ -106,6 +108,7 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
                         'count'     => $i,
                         'alt'       => $alt,
                         'message'   => $messages[$i],
+                        'duration'  => $durations_in_milliseconds[$i],
                     ] );
             }
         }
@@ -123,8 +126,9 @@ if ( !function_exists( 'betogether_get_slide' ) ) {
             $image_url = trim( esc_url( $image_url ) );
             $alt = ( !empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
             $message = ( !empty($args['message'] ) ) ? trim( sanitize_text_field( $args['message'] ) ) : '';
+            $duration = ( !empty( $args['duration'] ) ) ? trim( $args['duration'] ) : '4000';
             $result .= <<<HERE
-            <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}">
+            <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}" data-duration="{$duration}">
                 <img src="{$image_url}" alt="{$alt}" />
                 <p>{$message}</p>
             </div>
