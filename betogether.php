@@ -24,21 +24,48 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
         $result = '';
         $atts = shortcode_atts(
             array(
-                'image_urls'  => '',
+                'image_urls' => '',
                 'image_descriptions' => '',
                 'messages' => '',
             ), 
             $atts, 
             'betogether'
         );
-        $args = betogether_convert_atts_strings_to_args_arrays( $atts );
-        $result = betogether_get_html( $args );
+        $result = betogether_get_html( $atts );
         return $result;
     }
 }
 
-if ( !function_exists( 'betogether_convert_atts_strings_to_args_arrays' ) ) {
-    function betogether_convert_atts_strings_to_args_arrays( $atts ) {
+if ( !function_exists( 'betogether_get_html' ) ) {
+    function betogether_get_html( $atts ) {
+        $arrays = betogether_convert_input_strings_to_arrays( $atts );
+        $slide_container = betogether_add_container( 
+            [
+                'id'        => 'betogether-slide-container',
+                'content'   => betogether_get_slides( $arrays ),
+                'indent'    => 2,
+            ]
+        );
+        $controls_container = betogether_add_container( 
+            [
+                'id'        => 'betogether-controls-container',
+                'content'   => betogether_get_controls( $arrays ),
+                'indent'    => 2,
+            ]
+        );
+        $slider = betogether_add_container( 
+            [
+                'id'        => 'betogether-container',
+                'content'   => $slide_container . $controls_container,
+                'indent'    => 1,
+            ]
+        );
+        return $slider;
+    }
+}
+
+if ( !function_exists( 'betogether_convert_input_strings_to_arrays' ) ) {
+    function betogether_convert_input_strings_to_arrays( $atts ) {
         if ( !empty( $atts ) && is_array( $atts ) ) {
             foreach ( $atts as $key => $value ) {
                 $args[$key] = betogether_get_array_from_string( [ 'string' => $atts[$key] ] );
@@ -60,33 +87,6 @@ if ( !function_exists( 'betogether_get_array_from_string' ) ) {
             }
         }
         return $result;
-    }
-}
-
-if ( !function_exists( 'betogether_get_html' ) ) {
-    function betogether_get_html( $args ) {
-        $slide_container = betogether_add_container( 
-            [
-                'id' => 'betogether-slide-container',
-                'content' => betogether_get_slides( $args ),
-                'indent' => 2,
-            ]
-        );
-        $controls_container = betogether_add_container( 
-            [
-                'id' => 'betogether-controls-container',
-                'content' => betogether_get_controls( $args ),
-                'indent' => 2,
-            ]
-        );
-        $slider = betogether_add_container( 
-            [
-                'id' => 'betogether-container',
-                'content' => $slide_container . $controls_container,
-                'indent' => 1,
-            ]
-        );
-        return $slider;
     }
 }
 
