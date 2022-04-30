@@ -4,7 +4,7 @@
  * Author: David Potter
  * Author URI: https://github.com/dpotter05/
  * Text Domain: betogether
- * Description: Bare bones slider
+ * Description: A bare-bones shortcode slider
  * Version: 1.0
  * License: GPL2
  */
@@ -26,22 +26,27 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
             array(
                 'image_urls'  => '',
                 'image_descriptions' => '',
+                'messages' => '',
             ), 
             $atts, 
             'betogether'
         );
-        $image_url_array =  betogether_get_array_from_string( ['string' => $atts['image_urls']] );
-        $image_alt_array =  betogether_get_array_from_string( ['string' => $atts['image_descriptions']] );
-        $result = betogether_get_html( 
-            [
-                'image_url_array' => $image_url_array,
-                'image_alt_array' => $image_alt_array,
-            ]
-        );
+        $args = betogether_convert_atts_strings_to_args_arrays( $atts );
+        $result = betogether_get_html( $args );
         return $result;
     }
 }
 
+if ( !function_exists( 'betogether_convert_atts_strings_to_args_arrays' ) ) {
+    function betogether_convert_atts_strings_to_args_arrays( $atts ) {
+        if ( !empty( $atts ) && is_array( $atts ) ) {
+            foreach ( $atts as $key => $value ) {
+                $args[ $key ] = betogether_get_array_from_string( [ 'string' => $atts[ $key ] ] );
+            }
+        }
+        return $args;
+    }
+}
 
 if ( !function_exists( 'betogether_get_array_from_string' ) ) {
     function betogether_get_array_from_string( $args ) {
@@ -91,14 +96,14 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
     function betogether_get_slides( $args ) {
         $result = '
 ';
-        $image_url_array = ( !empty( $args['image_url_array'] ) ) ? $args['image_url_array'] : '';
-        $image_alt_array = ( !empty( $args['image_alt_array'] ) ) ? $args['image_alt_array'] : array();
-        if (!empty( $image_url_array ) && is_array( $image_url_array ) && count( $image_url_array ) > 0 ) {
-            for ( $i = 0; $i < count( $image_url_array ); $i++ ) {
-                $alt = ( !empty( $image_alt_array[$i] ) ) ? $image_alt_array[$i] : '';
+        $image_urls = ( !empty( $args['image_urls'] ) ) ? $args['image_urls'] : '';
+        $image_descriptions = ( !empty( $args['image_descriptions'] ) ) ? $args['image_descriptions'] : array();
+        if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
+            for ( $i = 0; $i < count( $image_urls ); $i++ ) {
+                $alt = ( !empty( $image_descriptions[$i] ) ) ? $image_descriptions[$i] : '';
                 $result .= betogether_get_image_tag_and_container( 
                     [
-                        'image_url' => $image_url_array[$i], 
+                        'image_url' => $image_urls[$i], 
                         'count' => $i,
                         'alt' => $alt,
                     ] );
@@ -132,9 +137,9 @@ if ( !function_exists( 'betogether_get_controls' ) ) {
     function betogether_get_controls( $args ) {
         $result = '
 ';
-        $image_url_array = ( !empty( $args['image_url_array'] ) ) ? $args['image_url_array'] : array();
-        if (!empty( $image_url_array ) && is_array( $image_url_array ) && count( $image_url_array ) > 0 ) {
-            for ( $i = 0; $i < count( $image_url_array ); $i++ ) {
+        $image_urls = ( !empty( $args['image_urls'] ) ) ? $args['image_urls'] : array();
+        if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
+            for ( $i = 0; $i < count( $image_urls ); $i++ ) {
                 $count = $i + 1;
                 $id = 'betogether-control-' . ( $i + 1 );
                 $css_class = 'betogether-control';
