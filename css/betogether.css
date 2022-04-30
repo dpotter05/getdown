@@ -34,6 +34,22 @@
     height: auto;
     width: 100%;
 }
+.betogether-slide p {
+    width: 80%;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 0.2rem;
+    font-family: arial;
+    text-transform: uppercase;
+    color: white;
+    padding: 0.4rem 20px;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 10%;
+    left: 10%;
+}
 #betogether-controls-container {
     height: 80px;
     width: 100%;
@@ -67,5 +83,12 @@
 }
 .betogether-control[aria-pressed="true"]::before {
     background-color: #555;
+}
+
+@media only screen and (max-width:768px) {
+    .betogether-slide p {
+        font-size: 0.9rem;
+        letter-spacing: 0.05rem;
+    }
 }
 
