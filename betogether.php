@@ -123,6 +123,7 @@ if ( !function_exists( 'betogether_get_slide' ) ) {
             $image_url = trim( esc_url( $image_url ) );
             $alt = ( !empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
             $message = ( !empty($args['message'] ) ) ? $args['message'] : '';
+            $message = ( !empty($args['message'] ) ) ? trim( sanitize_text_field( $args['message'] ) ) : '';
             $result .= <<<HERE
             <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}">
                 <img src="{$image_url}" alt="{$alt}" />

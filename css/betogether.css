@@ -1,6 +1,8 @@
 #betogether-container {
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    margin:40px auto;
 }
 #betogether-slide-container {
     height: auto;
@@ -36,6 +38,7 @@
 }
 .betogether-slide p {
     width: 80%;
+    box-sizing: border-box;
     text-align: center;
     font-size: 1.1rem;
     font-weight: 900;
@@ -46,12 +49,23 @@
     padding: 0.4rem 20px;
     margin: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    background-image: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 0, 0, 0.75),
+        rgba(0, 0, 0, 0.75),
+        rgba(0, 0, 0, 0.75),
+        transparent
+    );
     position: absolute;
     top: 10%;
     left: 10%;
 }
 #betogether-controls-container {
-    height: 80px;
+    --bt-button-size: 40px;
+    --bt-button-y-margin: 20px;
+    --bt-button-x-margin: 20px;
+    height: calc(var(--bt-button-size) + 2 * var(--bt-button-y-margin));
     width: 100%;
     display: flex;
     align-items: center;
@@ -59,10 +73,10 @@
 }
 .betogether-control {
     display: block;
-    height: 40px;
-    width: 40px;
+    height: var(--bt-button-size);
+    width: var(--bt-button-size);
     border-radius: 50%;
-    margin-right: 20px;
+    margin-right: var(--bt-button-x-margin);
     background-color: #111;
     position: relative;
 }
@@ -70,22 +84,30 @@
     margin-right: 0;
 }
 .betogether-control::before {
-    --b: 4px;
-    --size: calc(100% - 2 * var(--b));
+    --bt-size: calc(100% - 2 * 4px);
     content: "";
-    height: var(--size);
-    width: var(--size);
+    height: var(--bt-size);
+    width: var(--bt-size);
     position: absolute;
-    top: calc(50% - .5 * var(--size));
-    left: calc(50% - .5 * var(--size));
+    top: calc(50% - .5 * var(--bt-size));
+    left: calc(50% - .5 * var(--bt-size));
     background-color: #fff;
     border-radius: 50%;
 }
 .betogether-control[aria-pressed="true"]::before {
-    background-color: #555;
+    background-color: #000;
 }
 
 @media only screen and (max-width:768px) {
+    .betogether-slide p {
+        font-size: 0.9rem;
+        letter-spacing: 0.05rem;
+    }
+    #betogether-controls-container {
+        --bt-button-size: 30px;
+        --bt-button-y-margin: 14px;
+        --bt-button-x-margin: 14px;
+    }
     .betogether-slide p {
         font-size: 0.9rem;
         letter-spacing: 0.05rem;
