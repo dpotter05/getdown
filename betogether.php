@@ -103,9 +103,9 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
                 $result .= betogether_get_slide( 
                     [
                         'image_url' => $image_urls[$i], 
-                        'count' => $i,
-                        'alt' => $alt,
-                        'message' => $messages[$i],
+                        'count'     => $i,
+                        'alt'       => $alt,
+                        'message'   => $messages[$i],
                     ] );
             }
         }
@@ -144,16 +144,28 @@ if ( !function_exists( 'betogether_get_controls' ) ) {
             for ( $i = 0; $i < count( $image_urls ); $i++ ) {
                 $count = $i + 1;
                 $id = 'betogether-control-' . ( $i + 1 );
-                $css_class = 'betogether-control';
+                $css_class = 'betogether-slide-button';
                 $aria_pressed = ( $count === 1 ) ? 'true' : 'false';
                 $data_slide = 'betogether-slide-' . $count;
                 $result .= <<<HERE
-            <a href="#" id="{$id}" class="{$css_class}" role="button" aria-pressed="{$aria_pressed}" data-slide="{$data_slide}"></a>
+            <a href="#" id="{$id}" class="{$css_class}" data-slide="{$data_slide}" role="button" aria-pressed="{$aria_pressed}"></a>
 
 HERE;
             }
         }
+        $result .= betogether_get_pause_button();
         return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_get_pause_button' ) ) {
+    function betogether_get_pause_button() {
+        return <<<HERE
+            <a href="#" id="betogether-pause-button" role="button" aria-pressed="false">
+            <svg style="stroke:white; fill:white; stroke-opacity:1;stroke-linejoin:round;stroke-width:3.4;stroke-miterlimit:4;stroke-dasharray:none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="6.3 3.3 14.4 17.4"><path d="M8 5v14l11-7z"></path></svg>
+            </a>
+
+HERE;
     }
 }
 

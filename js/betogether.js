@@ -24,32 +24,49 @@ dpTools = {
         k = ( e.key === 'End' ) ? 'end' : k;
         k = ( e.key === 'Escape' ) ? 'escape' : k;
         return k;
+    },
+    addAnchorButtonListeners( arrayString, object, eventName ) {
+        const buttonArray = document.querySelectorAll( arrayString );
+        if ( dpTools.ns( buttonArray ) ) {
+            buttonArray.forEach(element => {
+                element.addEventListener("click", function(e) {
+                    object[ eventName ]( e );
+                });
+                element.onkeydown = function( e ) {
+                    keystroke = dpTools.getKeystrokeNames( e );
+                    if ( ( keystroke == 'enter' || keystroke == 'spacebar' ) ) {
+                    e.preventDefault();
+                    betogether.event( e );
+                    }
+                }
+            });
+        }
     }
 };
 
 var betogether = {
-    addButtonListeners: function() {
-        const buttonArray = document.querySelectorAll( 'a.betogether-control' );
-        if ( dpTools.ns( buttonArray ) ) {
-            for (let i = 0; i < buttonArray.length; i++) {
-                buttonArray[i].addEventListener( 'click', function( e ) { betogether.event( e ); });
-                buttonArray[i].onkeydown = function( e ) {
-                    keystroke = dpTools.getKeystrokeNames( e );
-                    if ( ( keystroke == 'enter' || keystroke == 'spacebar' ) ) {
-                      e.preventDefault();
-                      betogether.event( e );
-                    }
-                }
-            }
-        }
+    addListeners: function() {
+        betogether.addSlideButtonListeners();
+        betogether.addPauseButtonListeners();
     },
-    event: function( e ) {
+    addSlideButtonListeners: function() {
+        dpTools.addAnchorButtonListeners( 'a.betogether-slide-button', betogether, 'slideButtonEvent' );
+    },
+    addPauseButtonListeners: function() {
+        dpTools.addAnchorButtonListeners( 'a#betogether-pause-button', betogether, 'pauseButtonEvent' );
+    },
+    slideButtonEvent: function( e ) {
         e.preventDefault();
         const button = document.activeElement;
-        betogether.run( button );
+        betogether.runSlideButton( button );
     },
-    run: function( button ) {
-        const buttonArray = document.querySelectorAll( 'a.betogether-control' );
+    pauseButtonEvent: function( e ) {
+        e.preventDefault();
+        dpTools.toggleButton( document.activeElement, 'toggle' );
+        console.log( 'Pause' );
+    },
+    runSlideButton: function( button ) {
+        const buttonArray = document.querySelectorAll( 'a.betogether-slide-button' );
         if ( dpTools.ns( buttonArray )) {
             buttonArray.forEach(element => {
                 let slideArray = ( dpTools.nn( element.dataset.slide ) ) ? document.querySelectorAll('div#' + element.dataset.slide) : null;
@@ -66,5 +83,5 @@ var betogether = {
 };
 
 window.onload = function() {
-    betogether.addButtonListeners();
+    betogether.addListeners();
 };
