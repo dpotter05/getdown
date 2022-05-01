@@ -54,6 +54,10 @@ const dpTools = {
     getNextInArray( currentPosition, array ) {
         currentPosition = Number(currentPosition);
         return ( currentPosition + 1 <= array.length ) ? currentPosition + 1 : 1;
+    },
+    getAnchorButtonStatus( button ) {
+        const status = button.getAttribute( 'aria-pressed' );
+        return ( status === 'true' ) ? "on" : "off";
     }
 };
 
@@ -71,8 +75,7 @@ const betogether = {
         }
         return array;
     },
-    startSlider() {
-        const activeSlideArray = 
+    startSliderOnLoad() {
         betogether.addListeners();
         betogether.startSlideTimer();
     },
@@ -93,9 +96,23 @@ const betogether = {
     },
     pauseButtonEvent( e ) {
         e.preventDefault();
-        dpTools.toggleButton( document.activeElement, 'toggle' );
-        console.log( 'Pause' );
-        clearInterval(betogetherSlideTimer);
+        const pauseButton = document.activeElement;
+        dpTools.toggleButton( pauseButton, 'toggle' );
+        if ( dpTools.getAnchorButtonStatus( pauseButton ) === 'on' ) {
+            betogether.toggleSlider( 'pause', 'click' );
+            console.log("Stop");
+        } else {
+            betogether.toggleSlider( 'play', 'click' );
+            console.log("Play");
+        }
+        
+    },
+    toggleSlider( action, type ) {
+        if ( action === 'pause' && type === 'click' ) {
+            clearInterval(betogetherSlideTimer);
+        } else if ( action === 'play' ) {
+            betogether.startSlideTimer();
+        }        
     },
     runSlideButton( button ) {
         const buttonArray = document.querySelectorAll( 'a.betogether-slide-button' );
@@ -149,5 +166,5 @@ const betogether = {
 };
 
 window.onload = function() {
-    betogether.startSlider();
+    betogether.startSliderOnLoad();
 };
