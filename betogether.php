@@ -112,6 +112,7 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
                     ] );
             }
         }
+        $result .= betogether_get_progress_bar();
         return $result;
     }
 }
@@ -136,6 +137,15 @@ if ( !function_exists( 'betogether_get_slide' ) ) {
 HERE;
         }
         return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_get_progress_bar' ) ) {
+    function betogether_get_progress_bar() {
+        return <<<HERE
+            <div id="betogether-progress-bar"></div>
+
+HERE;
     }
 }
 

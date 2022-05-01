@@ -71,7 +71,9 @@ const betogether = {
         } else if ( query === 'all slides' ) {
             array = document.querySelectorAll( 'div.betogether-slide' );
         } else if ( query === 'active slide' ) {
-            array = document.querySelectorAll( 'div.betogether-slide:not( .off )');
+            array = document.querySelectorAll( 'div.betogether-slide:not( .off )' );
+        } else if ( query === 'progress bar' ) {
+            array = document.querySelectorAll( 'div#betogether-progress-bar' );
         }
         return array;
     },
@@ -80,19 +82,13 @@ const betogether = {
         betogether.startSlideTimer();
     },
     addListeners() {
-        betogether.addSlideButtonListeners();
-        betogether.addPauseButtonListeners();
-    },
-    addSlideButtonListeners() {
         dpTools.addAnchorButtonListeners( 'a.betogether-slide-button', betogether, 'slideButtonEvent' );
-    },
-    addPauseButtonListeners() {
         dpTools.addAnchorButtonListeners( 'a#betogether-pause-button', betogether, 'pauseButtonEvent' );
     },
     slideButtonEvent( e ) {
         e.preventDefault();
         const button = document.activeElement;
-        betogether.runSlideButton( button );
+        betogether.startThisSlide( button );
     },
     pauseButtonEvent( e ) {
         e.preventDefault();
@@ -100,12 +96,9 @@ const betogether = {
         dpTools.toggleButton( pauseButton, 'toggle' );
         if ( dpTools.getAnchorButtonStatus( pauseButton ) === 'on' ) {
             betogether.toggleSlider( 'pause', 'click' );
-            console.log("Stop");
         } else {
             betogether.toggleSlider( 'play', 'click' );
-            console.log("Play");
         }
-        
     },
     toggleSlider( action, type ) {
         if ( action === 'pause' && type === 'click' ) {
@@ -113,35 +106,28 @@ const betogether = {
         } else if ( action === 'play' ) {
             betogether.startSlideTimer();
         }        
-    },
-    runSlideButton( button ) {
-        const buttonArray = document.querySelectorAll( 'a.betogether-slide-button' );
-        if ( dpTools.ns( buttonArray )) {
-            buttonArray.forEach(element => {
-                let slideArray = ( dpTools.nn( element.dataset.slide ) ) ? document.querySelectorAll('div#' + element.dataset.slide) : null;
-                if (element.id === button.id) {
-                    dpTools.toggleButton( element, 'on' );
-                    if ( dpTools.nn( slideArray ) ) slideArray[0].classList.remove( 'off' );
-                } else {
-                    dpTools.toggleButton( element, 'off' );
-                    if ( dpTools.nn( slideArray ) ) slideArray[0].classList.add( 'off' );
-                }
-            });
-        }
     }, startSlideTimer() {
         const activeSlideArray = betogether.getElements( 'active slide' );
         if ( dpTools.ns( activeSlideArray ) ) {
             const totalDuration = Number( activeSlideArray[0].dataset.duration );
             const nowStamp = Date.now();
             const start = nowStamp;
+            betogether.updateProgressBarLength( 0, totalDuration );
             betogetherSlideTimer = setInterval( function() {
                 let timestamp = Date.now();
                 let elapsedTime = timestamp - start;
+                betogether.updateProgressBarLength( elapsedTime, totalDuration );
                 if (elapsedTime >= totalDuration) {
                     clearInterval(betogetherSlideTimer);
                     betogether.nextSlide();
                 }
             }, 20);
+        }
+    }, updateProgressBarLength( elapsedTime, totalDuration ) {
+        const progressBarArray = betogether.getElements( 'progress bar' );
+        if ( dpTools.ns( progressBarArray ) ) {
+            let progressbar = progressBarArray[0];
+            progressbar.style.width = ( ( elapsedTime / totalDuration ) * 100 ).toFixed(2) + '%';
         }
     }, nextSlide() {
         const slideButtonArray = betogether.getElements( 'all slide buttons' );
@@ -151,17 +137,26 @@ const betogether = {
             let currentSlideButton = activeSlideButtonArray[0];
             let currentSlideNumber = ( dpTools.nn( currentSlideButton.dataset.slide ) ) ? Number( currentSlideButton.dataset.slide ) : 1;
             let nextSlideNumber = dpTools.getNextInArray( currentSlideNumber, slideButtonArray );
-            for (let i = 0; i < slideButtonArray.length; i++) {
-                if ( slideButtonArray[i].id === 'betogether-control-' + nextSlideNumber) {
-                    dpTools.toggleButton( slideButtonArray[i], 'on' );
-                    dpTools.toggleCSS( slideArray[i], 'remove', 'off' );
-                } else {
-                    dpTools.toggleButton( slideButtonArray[i], 'off' );
-                    dpTools.toggleCSS( slideArray[i], 'add', 'off' );
+            slideButtonArray.forEach(element => {
+                if ( element.id == 'betogether-control-' + nextSlideNumber ) {
+                    betogether.startThisSlide( element );
                 }
-            }
-            betogether.startSlideTimer();
+            });
         }
+    }, startThisSlide( slideButton ) {
+        const slideButtonArray = betogether.getElements( 'all slide buttons' );
+        const slideArray = betogether.getElements( 'all slides' );
+        betogether.toggleSlider( 'pause', 'click' )
+        for (let i = 0; i < slideButtonArray.length; i++) {
+            if ( slideButtonArray[i].id === slideButton.id ) {
+                dpTools.toggleButton( slideButtonArray[i], 'on' );
+                dpTools.toggleCSS( slideArray[i], 'remove', 'off' );
+            } else {
+                dpTools.toggleButton( slideButtonArray[i], 'off' );
+                dpTools.toggleCSS( slideArray[i], 'add', 'off' );
+            }
+        }
+        betogether.startSlideTimer();
     }
 };
 
