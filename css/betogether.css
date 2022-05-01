@@ -1,9 +1,10 @@
 #betogether-container {
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    margin:40px auto;
+    margin: 40px auto;
+    overflow: hidden;
 }
 #betogether-slide-container {
     align-items: center;
@@ -60,6 +61,24 @@
     text-align: center;
     top: 10%;
     width: 80%;
+}
+#betogether-progress-bar-container {
+    --betogether-progress-bar-color: black;
+    --betogether-progress-bar-height: 2px;
+    --betogether-progress-bar-margin: 2px;
+    background-color: #999;
+    height: calc( var(--betogether-progress-bar-height) + 2 * var(--betogether-progress-bar-margin));
+    position: relative;
+    width: 100%;
+}
+#betogether-progress-bar {
+    background-color: var(--betogether-progress-bar-color);
+    top: calc(50% - .5 * var(--betogether-progress-bar-height));
+    height: var(--betogether-progress-bar-height);
+    left: 0;
+    position: absolute;
+    transform-origin: 0 0;
+    width: 100%;
 }
 #betogether-controls-container {
     --bt-button-border-color: #111;
@@ -138,19 +157,6 @@
 #betogether-pause-button[aria-pressed="true"]::before,
 #betogether-pause-button[aria-pressed="true"]::after {
     display:none;
-}
-
-#betogether-progress-bar {
-    --betogether-progress-bar-color: black;
-    --betogether-progress-bar-height: 2px;
-    --betogether-progress-bar-margin-top: 2px;
-    background-color: var(--betogether-progress-bar-color);
-    bottom: calc(-1 * var(--betogether-progress-bar-height) - var(--betogether-progress-bar-margin-top));
-    height: var(--betogether-progress-bar-height);
-    left: 0;
-    position: absolute;
-    transform-origin: 0 0;
-    width: 100%;
 }
 
 @media only screen and (max-width:768px) {

@@ -47,6 +47,13 @@ if ( !function_exists( 'betogether_get_html' ) ) {
                 'indent'    => 2,
             ]
         );
+        $progress_bar_container = betogether_add_container( 
+            [
+                'id'        => 'betogether-progress-bar-container',
+                'content'   => betogether_get_progress_bar(),
+                'indent'    => 2,
+            ]
+        );
         $controls_container = betogether_add_container( 
             [
                 'id'        => 'betogether-controls-container',
@@ -57,7 +64,7 @@ if ( !function_exists( 'betogether_get_html' ) ) {
         $slider = betogether_add_container( 
             [
                 'id'        => 'betogether-container',
-                'content'   => $slide_container . $controls_container,
+                'content'   => $slide_container . $progress_bar_container . $controls_container,
                 'indent'    => 1,
             ]
         );
@@ -112,7 +119,6 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
                     ] );
             }
         }
-        $result .= betogether_get_progress_bar();
         return $result;
     }
 }
@@ -143,6 +149,7 @@ HERE;
 if ( !function_exists( 'betogether_get_progress_bar' ) ) {
     function betogether_get_progress_bar() {
         return <<<HERE
+        
             <div id="betogether-progress-bar"></div>
 
 HERE;
