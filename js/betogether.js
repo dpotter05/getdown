@@ -37,8 +37,8 @@ const dpTools = {
                 element.onkeydown = function( e ) {
                     keystroke = dpTools.getKeystrokeNames( e );
                     if ( ( keystroke == 'enter' || keystroke == 'spacebar' ) ) {
-                    e.preventDefault();
-                    betogether.event( e );
+                        e.preventDefault();
+                        object[ eventName ]( e );
                     }
                 }
             });
@@ -64,18 +64,14 @@ const dpTools = {
 const betogether = {
     getElements( query ) {
         let array = [];
-        if ( query === 'active slide button' ) {
-            array = document.querySelectorAll( 'a.betogether-slide-button[aria-pressed="true"]' );
-        } else if ( query === 'all slide buttons' ) {
-            array = document.querySelectorAll( 'a.betogether-slide-button' );
-        } else if ( query === 'all slides' ) {
-            array = document.querySelectorAll( 'div.betogether-slide' );
-        } else if ( query === 'active slide' ) {
-            array = document.querySelectorAll( 'div.betogether-slide:not( .off )' );
-        } else if ( query === 'progress bar' ) {
-            array = document.querySelectorAll( 'div#betogether-progress-bar' );
+        let queryObject = {
+            'active slide button' : 'a.betogether-slide-button[aria-pressed="true"]',
+            'all slide buttons' : 'a.betogether-slide-button',
+            'all slides' : 'div.betogether-slide',
+            'active slide' : 'div.betogether-slide:not( .off )',
+            'progress bar' : 'div#betogether-progress-bar'
         }
-        return array;
+        return document.querySelectorAll( queryObject[ query ] );
     },
     startSliderOnLoad() {
         betogether.addListeners();
