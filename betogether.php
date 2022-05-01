@@ -133,11 +133,12 @@ if ( !function_exists( 'betogether_get_slide' ) ) {
             $image_url = trim( esc_url( $image_url ) );
             $alt = ( !empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
             $message = ( !empty($args['message'] ) ) ? trim( sanitize_text_field( $args['message'] ) ) : '';
+            $message = ( $message == '-' ) ? "" : '<p>' . $message . '</p>';
             $duration = ( !empty( $args['duration'] ) ) ? trim( $args['duration'] ) : '4000';
             $result .= <<<HERE
             <div id="betogether-slide-{$count}" class="betogether-slide{$offCSS}" data-duration="{$duration}">
                 <img src="{$image_url}" alt="{$alt}" />
-                <p>{$message}</p>
+                {$message}
             </div>
 
 HERE;
@@ -149,7 +150,7 @@ HERE;
 if ( !function_exists( 'betogether_get_progress_bar' ) ) {
     function betogether_get_progress_bar() {
         return <<<HERE
-        
+
             <div id="betogether-progress-bar"></div>
 
 HERE;
