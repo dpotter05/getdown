@@ -29,6 +29,7 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
                 'messages' => '',
                 'durations_in_milliseconds' => '',
                 'pause_on_mouseover' => '',
+                'pause_when_out_of_view' => '',
             ), 
             $atts, 
             'betogether'
@@ -41,11 +42,12 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
 if ( !function_exists( 'betogether_get_html' ) ) {
     function betogether_get_html( $atts ) {
         $arrays = betogether_convert_input_strings_to_arrays( $atts );
-        $pause_on_mouseover = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
+        $sliderContainerCSS = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
+        $sliderContainerCSS .= ( $arrays['pause_when_out_of_view'][0] === 'yes' ) ? ' pause_when_out_of_view' : '' ;
         $slide_container = betogether_add_container(
             [
                 'id'        => 'betogether-slide-container',
-                'cssClass'        => '',
+                'cssClass'  => '',
                 'content'   => betogether_get_slides( $arrays ),
                 'indent'    => 2,
             ]
@@ -53,7 +55,7 @@ if ( !function_exists( 'betogether_get_html' ) ) {
         $progress_bar_container = betogether_add_container(
             [
                 'id'        => 'betogether-progress-bar-container',
-                'cssClass'        => '',
+                'cssClass'  => '',
                 'content'   => betogether_get_progress_bar(),
                 'indent'    => 2,
             ]
@@ -62,7 +64,7 @@ if ( !function_exists( 'betogether_get_html' ) ) {
             [
                 'id'        => 'betogether-controls-container',
                 'content'   => betogether_get_controls( $arrays ),
-                'cssClass'        => '',
+                'cssClass'  => '',
                 'indent'    => 2,
             ]
         );
@@ -70,7 +72,7 @@ if ( !function_exists( 'betogether_get_html' ) ) {
             [
                 'id'        => 'betogether-container',
                 'content'   => $slide_container . $progress_bar_container . $controls_container,
-                'cssClass'        => $pause_on_mouseover,
+                'cssClass'  => $sliderContainerCSS,
                 'indent'    => 1,
             ]
         );

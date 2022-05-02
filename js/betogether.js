@@ -8,6 +8,10 @@ const betogether = {
     addListeners() {
         dpTools.addAnchorButtonListeners( 'a.betogether-slide-button', betogether, 'slideButtonEvent' );
         dpTools.addAnchorButtonListeners( 'a#betogether-pause-button', betogether, 'pauseButtonEvent' );
+        betogether.mouseoverListener();
+        betogether.scrollListener();
+    },
+    mouseoverListener() {
         const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
         const slideContainerArray = betogether.getElementsArray( 'slide container' );
         if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) ) {
@@ -21,12 +25,41 @@ const betogether = {
                     betogether.toggleSliderPausePlay( 'play', 'nonclick' );
                 };
             }
+        } 
+    },
+    scrollListener() {
+        window.onscroll = function (e) {
+            const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
+            const slideContainerArray = betogether.getElementsArray( 'slide container' );
+            const pauseButtonArray = betogether.getElementsArray( 'pause button' );
+            if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) && dpTools.ns( pauseButtonArray ) ) {
+                let sliderMainContainer = sliderMainContainerArray[0];
+                if ( sliderMainContainer.classList.contains('pause_when_out_of_view') ) {
+                    let slideContainer = slideContainerArray[0];
+                    let pauseHeight = 0.5 * ( dpTools.getElementHeight( slideContainer ) );
+                    let elementIsInViewport = dpTools.elementIsInViewport( slideContainer, ( pauseHeight ) );
+                    let pauseButton = pauseButtonArray[0];
+                    let lastPauseType = pauseButton.dataset.last_pause_type;
+                    let sliderIsPlaying = betogether.isSliderPlaying();
+                    if ( dpTools.nn( lastPauseType ) ) {
+                        if (
+                            elementIsInViewport === 'yes' &&
+                            sliderIsPlaying === 'no' &&
+                            lastPauseType === 'nonclick' 
+                        ) {
+                            betogether.toggleSliderPausePlay( 'play', null );
+                        } else if ( elementIsInViewport === 'no' ) {
+                            betogether.toggleSliderPausePlay( 'pause', 'nonclick' );
+                        }
+                    }
+                }
+            }
         }
     },
     slideButtonEvent( e ) {
         e.preventDefault();
-        const button = document.activeElement;
-        betogether.startThisSlide( button );
+        const slideButton = document.activeElement;
+        betogether.startThisSlide( slideButton );
     },
     pauseButtonEvent( e ) {
         e.preventDefault();
@@ -245,6 +278,16 @@ const dpTools = {
     getAnchorButtonStatus( button ) {
         const status = button.getAttribute( 'aria-pressed' );
         return ( status === 'true' ) ? "on" : "off";
+    },
+    elementIsInViewport( el, pixelsShowing ) {
+        let rect = el.getBoundingClientRect();
+        let testTop = (window.innerHeight - rect.top > pixelsShowing) ? true : false;
+        let testBottom = (rect.bottom > pixelsShowing) ? true : false;
+        return (testTop && testBottom) ? 'yes' : 'no';
+    },
+    getElementHeight( element ) {
+        let rect = element.getBoundingClientRect();
+        return ( rect.top > rect.bottom ) ? rect.top - rect.bottom : rect.bottom - rect.top;
     }
 };
 
