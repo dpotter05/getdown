@@ -28,6 +28,7 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
                 'image_descriptions' => '',
                 'messages' => '',
                 'durations_in_milliseconds' => '',
+                'pause_on_mouseover' => '',
             ), 
             $atts, 
             'betogether'
@@ -40,31 +41,36 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
 if ( !function_exists( 'betogether_get_html' ) ) {
     function betogether_get_html( $atts ) {
         $arrays = betogether_convert_input_strings_to_arrays( $atts );
-        $slide_container = betogether_add_container( 
+        $pause_on_mouseover = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
+        $slide_container = betogether_add_container(
             [
                 'id'        => 'betogether-slide-container',
+                'cssClass'        => '',
                 'content'   => betogether_get_slides( $arrays ),
                 'indent'    => 2,
             ]
         );
-        $progress_bar_container = betogether_add_container( 
+        $progress_bar_container = betogether_add_container(
             [
                 'id'        => 'betogether-progress-bar-container',
+                'cssClass'        => '',
                 'content'   => betogether_get_progress_bar(),
                 'indent'    => 2,
             ]
         );
-        $controls_container = betogether_add_container( 
+        $controls_container = betogether_add_container(
             [
                 'id'        => 'betogether-controls-container',
                 'content'   => betogether_get_controls( $arrays ),
+                'cssClass'        => '',
                 'indent'    => 2,
             ]
         );
-        $slider = betogether_add_container( 
+        $slider = betogether_add_container(
             [
                 'id'        => 'betogether-container',
                 'content'   => $slide_container . $progress_bar_container . $controls_container,
+                'cssClass'        => $pause_on_mouseover,
                 'indent'    => 1,
             ]
         );
@@ -183,8 +189,8 @@ HERE;
 if ( !function_exists( 'betogether_get_pause_button' ) ) {
     function betogether_get_pause_button() {
         return <<<HERE
-            <a href="#" id="betogether-pause-button" role="button" aria-pressed="false">
-            <svg style="stroke:white; fill:white; stroke-opacity:1;stroke-linejoin:round;stroke-width:3.4;stroke-miterlimit:4;stroke-dasharray:none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="6.3 3.3 14.4 17.4"><path d="M8 5v14l11-7z"></path></svg>
+            <a href="#" id="betogether-pause-button" role="button" aria-pressed="false" data-last_pause_type="null">
+                <svg style="stroke:white; fill:white; stroke-opacity:1;stroke-linejoin:round;stroke-width:3.4;stroke-miterlimit:4;stroke-dasharray:none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="6.3 3.3 14.4 17.4"><path d="M8 5v14l11-7z"></path></svg>
             </a>
 
 HERE;
@@ -195,13 +201,14 @@ if ( !function_exists( 'betogether_add_container' ) ) {
     function betogether_add_container( $args ) {
         $result = '';
         $id = ( !empty( $args['id'] ) ) ? $args['id'] : '';
+        $cssClass = ( !empty( $args['cssClass'] ) ) ? ' class="' . $args['cssClass'] . '"' : '';
         $content = ( !empty( $args['content'] ) ) ? rtrim( $args['content'] ) : '';
         $indent = ( !empty( $args['indent'] ) && is_numeric( $args['indent'] ) ) ? $args['indent'] : '';
         $tab = betogether_get_tab_indentation( $indent );
         if ( !empty( $content ) ) {
             $result .= <<<HERE
 
-{$tab}<div id="{$id}">{$content}
+{$tab}<div id="{$id}"{$cssClass}>{$content}
 {$tab}</div>
 HERE;
         }
