@@ -59,7 +59,7 @@
     position: absolute;
     margin: 0;
     text-align: center;
-    top: 10%;
+    bottom: 10px;
     width: 80%;
 }
 #betogether-progress-bar-container {
