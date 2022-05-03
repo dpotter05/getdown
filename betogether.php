@@ -29,7 +29,8 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
                 'messages' => '',
                 'durations_in_milliseconds' => '',
                 'pause_on_mouseover' => '',
-                'pause_when_out_of_view' => '',
+                'pause_when_viewing_another_tab' => '',
+                'pause_on_scroll' => '',
             ), 
             $atts, 
             'betogether'
@@ -43,7 +44,8 @@ if ( !function_exists( 'betogether_get_html' ) ) {
     function betogether_get_html( $atts ) {
         $arrays = betogether_convert_input_strings_to_arrays( $atts );
         $sliderContainerCSS = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
-        $sliderContainerCSS .= ( $arrays['pause_when_out_of_view'][0] === 'yes' ) ? ' pause_when_out_of_view' : '' ;
+        $sliderContainerCSS .= ( $arrays['pause_when_viewing_another_tab'][0] === 'yes' ) ? ' pause_when_viewing_another_tab' : '' ;
+        $sliderContainerCSS .= ( $arrays['pause_on_scroll'][0] === 'yes' ) ? ' pause_on_scroll' : '' ;
         $slide_container = betogether_add_container(
             [
                 'id'        => 'betogether-slide-container',
@@ -191,7 +193,7 @@ HERE;
 if ( !function_exists( 'betogether_get_pause_button' ) ) {
     function betogether_get_pause_button() {
         return <<<HERE
-            <a href="#" id="betogether-pause-button" role="button" aria-pressed="false" data-last_pause_type="null">
+            <a href="#" id="betogether-pause-button" role="button" aria-pressed="false" data-last_pause_type="nonclick onload">
                 <svg style="stroke:white; fill:white; stroke-opacity:1;stroke-linejoin:round;stroke-width:3.4;stroke-miterlimit:4;stroke-dasharray:none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="6.3 3.3 14.4 17.4"><path d="M8 5v14l11-7z"></path></svg>
             </a>
 

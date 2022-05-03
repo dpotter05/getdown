@@ -2,14 +2,15 @@
 
 const betogether = {
     startSliderOnLoad() {
-        betogether.addListeners();
         betogether.startSlideTimer();
+        betogether.addListeners();
     },
     addListeners() {
         dpTools.addAnchorButtonListeners( 'a.betogether-slide-button', betogether, 'slideButtonEvent' );
         dpTools.addAnchorButtonListeners( 'a#betogether-pause-button', betogether, 'pauseButtonEvent' );
         betogether.mouseoverListener();
         betogether.scrollListener();
+        betogether.tabIsInBackgroundListener();
     },
     mouseoverListener() {
         const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
@@ -17,44 +18,84 @@ const betogether = {
         if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) ) {
             let sliderMainContainer = sliderMainContainerArray[0];
             let slideContainer = slideContainerArray[0];
-            if (sliderMainContainer.classList.contains( 'pause-on-mouseover' )) {
+            if ( sliderMainContainer.classList.contains( 'pause-on-mouseover' ) ) {
                 slideContainer.onmouseenter = function(e) {
-                    betogether.toggleSliderPausePlay( 'pause', 'nonclick' );
+                    if ( sliderMainContainer.classList.contains( 'pause-on-mouseover' ) ) {
+                        betogether.toggleSliderPausePlay( 'pause', 'nonclick mouseover' );
+                    }
                 };
                 slideContainer.onmouseout = function(e) {
-                    betogether.toggleSliderPausePlay( 'play', 'nonclick' );
+                    if ( sliderMainContainer.classList.contains( 'pause-on-mouseover' ) ) {
+                        betogether.toggleSliderPausePlay( 'play', null );
+                    }
                 };
             }
         } 
+    },
+    toggleMouseoverListener( action ) {
+        const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
+        if ( dpTools.ns( sliderMainContainerArray ) ) {
+            let sliderMainContainer = sliderMainContainerArray[0];
+            dpTools.toggleCSS( sliderMainContainer, action, 'pause-on-mouseover' );
+        }
     },
     scrollListener() {
         window.onscroll = function (e) {
             const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
             const slideContainerArray = betogether.getElementsArray( 'slide container' );
-            const pauseButtonArray = betogether.getElementsArray( 'pause button' );
-            if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) && dpTools.ns( pauseButtonArray ) ) {
+            if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) ) {
                 let sliderMainContainer = sliderMainContainerArray[0];
-                if ( sliderMainContainer.classList.contains('pause_when_out_of_view') ) {
+                if ( sliderMainContainer.classList.contains( 'pause_on_scroll' ) ) {
                     let slideContainer = slideContainerArray[0];
-                    let pauseHeight = 0.5 * ( dpTools.getElementHeight( slideContainer ) );
-                    let elementIsInViewport = dpTools.elementIsInViewport( slideContainer, ( pauseHeight ) );
-                    let pauseButton = pauseButtonArray[0];
-                    let lastPauseType = pauseButton.dataset.last_pause_type;
-                    let sliderIsPlaying = betogether.isSliderPlaying();
-                    if ( dpTools.nn( lastPauseType ) ) {
-                        if (
-                            elementIsInViewport === 'yes' &&
-                            sliderIsPlaying === 'no' &&
-                            lastPauseType === 'nonclick' 
-                        ) {
-                            betogether.toggleSliderPausePlay( 'play', null );
-                        } else if ( elementIsInViewport === 'no' ) {
-                            betogether.toggleSliderPausePlay( 'pause', 'nonclick' );
-                        }
-                    }
+                    betogether.toggleSliderPausePlay( 'pause', 'click' );
+                    betogether.toggleMouseoverListener( 'remove' );
                 }
             }
         }
+        let sliderIsInViewOnLoad = betogether.sliderIsInViewport();
+        if ( sliderIsInViewOnLoad === 'no' ) {
+            betogether.toggleSliderPausePlay( 'pause', 'click' );
+        }
+    },
+    toggleScrollListener( action ) {
+        const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
+        if ( dpTools.ns( sliderMainContainerArray ) ) {
+            let sliderMainContainer = sliderMainContainerArray[0];
+            dpTools.toggleCSS( sliderMainContainer, action, 'pause_when_viewing_another_tab' );
+        }
+    },
+    getLastPauseType() {
+        const pauseButtonArray = betogether.getElementsArray( 'pause button' );
+        if ( dpTools.ns( pauseButtonArray ) ) {
+            result = '';
+            let pauseButton = pauseButtonArray[0];
+            let lastPauseType = pauseButton.dataset.last_pause_type;
+            if ( dpTools.nn( lastPauseType ) ) {
+                result = lastPauseType;
+            }
+        }
+        return result;
+    },
+    sliderIsInViewport() {
+        const slideContainerArray = betogether.getElementsArray( 'slide container' );
+        let result = '';
+        if ( dpTools.ns( slideContainerArray ) ) {
+            let slideContainer = slideContainerArray[0];
+            let pauseHeight = 0.5 * ( dpTools.getElementHeight( slideContainer ) );
+            let elementIsInViewport = dpTools.elementIsInViewport( slideContainer, ( pauseHeight ) );
+            result = ( elementIsInViewport === 'yes' ) ? 'yes' : 'no';
+        }
+        return result;
+    },
+    tabIsInBackgroundListener() {
+        document.onvisibilitychange = function( e ) {
+            let lastPauseType = betogether.getLastPauseType();
+            let sliderIsPlaying = betogether.isSliderPlaying();
+            if ( sliderIsPlaying === 'yes' ) {
+                betogether.toggleSliderPausePlay( 'pause', 'click' );
+            }
+        };
+
     },
     slideButtonEvent( e ) {
         e.preventDefault();
@@ -75,7 +116,10 @@ const betogether = {
         if ( dpTools.ns( pauseButtonArray ) ) {
             let pauseButton = pauseButtonArray[0];
             dpTools.toggleButton( pauseButton, action );
-            if ( pauseType === 'click' || pauseType === 'nonclick' ) {
+            if ( 
+                pauseType !== null && 
+                ( pauseType === 'click' || dpTools.stringContains( pauseType, 'nonclick' ) === 'yes' )
+            ) {
                 pauseButton.dataset.last_pause_type = pauseType;
             }       
         }
@@ -87,22 +131,33 @@ const betogether = {
             return ( dpTools.nn( pauseButton.dataset.last_pause_type ) ) ? pauseButton.dataset.last_pause_type : 'nonclick';
         }
     },
-    toggleSliderPausePlay( action, type ) {
+    toggleSliderPausePlay( action, pauseType ) {
+        // pauseType null is used when action === 'play'
         let result = '';
-        if ( ( type === 'click' || type === null ) && ( action === 'play' || action === 'pause' ) ) {
-            result = ( action === 'play' ) ? 'play slider' : 'pause slider';
-        } else if ( type === 'nonclick' ) {
-            if ( action === 'pause' && betogether.isSliderPlaying() === 'yes' ) {
+        if ( action === 'play' ) {
+            result = 'play slider';
+        } else if ( action === 'pause' ) {
+            if ( 
+                pauseType === 'click' ||
+                pauseType === null ||
+                betogether.beginNonclickPause( pauseType ) == 'yes'
+            ) {
                 result = 'pause slider';
-            } else if ( action === 'play' && betogether.getLastPauseType() === 'nonclick') {
-                result = 'play slider';
             }
         }
         if ( result === 'pause slider' ) {
-            betogether.stopSlider( type );
+            betogether.stopSlider( pauseType );
         } else if ( result === 'play slider' ) {
             betogether.startSlideTimer();
         }
+    },
+    beginNonclickPause( pauseType ) {
+        return (
+            dpTools.stringContains( pauseType, 'nonclick' ) === 'yes' &&
+            betogether.isSliderPlaying() === 'yes'
+        ) ?
+        'yes' :
+        'no' ;
     },
     isSliderPlaying() {
         const pauseButtonArray = betogether.getElementsArray( 'pause button' );
@@ -178,7 +233,7 @@ const betogether = {
         if ( dpTools.ns( activeSlideButtonArray ) && dpTools.ns( slideButtonArray ) ) {
             let currentSlideButton = activeSlideButtonArray[0];
             let currentSlideNumber = ( dpTools.nn( currentSlideButton.dataset.slide ) ) ? Number( currentSlideButton.dataset.slide ) : 1;
-            let nextSlideNumber = dpTools.getNextInArray( currentSlideNumber, slideButtonArray );
+            let nextSlideNumber = dpTools.getNextInArray( currentSlideNumber, slideButtonArray, 1 );
             slideButtonArray.forEach(element => {
                 if ( element.id == 'betogether-control-' + nextSlideNumber ) {
                     betogether.startThisSlide( element );
@@ -271,9 +326,9 @@ const dpTools = {
           element.classList.toggle( css );
         }
     },
-    getNextInArray( currentPosition, array ) {
+    getNextInArray( currentPosition, array, start ) {
         currentPosition = Number(currentPosition);
-        return ( currentPosition + 1 <= array.length ) ? currentPosition + 1 : 1;
+        return ( currentPosition + 1 <= array.length ) ? currentPosition + 1 : start;
     },
     getAnchorButtonStatus( button ) {
         const status = button.getAttribute( 'aria-pressed' );
@@ -281,13 +336,16 @@ const dpTools = {
     },
     elementIsInViewport( el, pixelsShowing ) {
         let rect = el.getBoundingClientRect();
-        let testTop = (window.innerHeight - rect.top > pixelsShowing) ? true : false;
-        let testBottom = (rect.bottom > pixelsShowing) ? true : false;
-        return (testTop && testBottom) ? 'yes' : 'no';
+        let testTop = ( window.innerHeight - rect.top > pixelsShowing ) ? true : false;
+        let testBottom = ( rect.bottom > pixelsShowing ) ? true : false;
+        return ( testTop && testBottom ) ? 'yes' : 'no';
     },
     getElementHeight( element ) {
         let rect = element.getBoundingClientRect();
         return ( rect.top > rect.bottom ) ? rect.top - rect.bottom : rect.bottom - rect.top;
+    },
+    stringContains( haystack, needle ) {
+        return ( haystack.indexOf( needle ) != -1 ) ? 'yes' : 'no';
     }
 };
 
