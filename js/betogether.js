@@ -13,8 +13,8 @@ const betogether = {
         betogether.tabIsInBackgroundListener();
     },
     mouseoverListener() {
-        const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
-        const slideContainerArray = betogether.getElementsArray( 'slide container' );
+        const sliderMainContainerArray = betogether.getNodeList( 'slider container' );
+        const slideContainerArray = betogether.getNodeList( 'slide container' );
         if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) ) {
             let sliderMainContainer = sliderMainContainerArray[0];
             let slideContainer = slideContainerArray[0];
@@ -36,7 +36,7 @@ const betogether = {
         } 
     },
     toggleMouseoverListener( action ) {
-        const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
+        const sliderMainContainerArray = betogether.getNodeList( 'slider container' );
         if ( dpTools.ns( sliderMainContainerArray ) ) {
             let sliderMainContainer = sliderMainContainerArray[0];
             dpTools.toggleCSS( sliderMainContainer, action, 'pause-on-mouseover' );
@@ -44,8 +44,8 @@ const betogether = {
     },
     scrollListener() {
         window.onscroll = function (e) {
-            const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
-            const slideContainerArray = betogether.getElementsArray( 'slide container' );
+            const sliderMainContainerArray = betogether.getNodeList( 'slider container' );
+            const slideContainerArray = betogether.getNodeList( 'slide container' );
             if ( dpTools.ns( sliderMainContainerArray ) && dpTools.ns( slideContainerArray ) ) {
                 let sliderMainContainer = sliderMainContainerArray[0];
                 if ( sliderMainContainer.classList.contains( 'pause_on_scroll' ) ) {
@@ -61,7 +61,7 @@ const betogether = {
         }
     },
     sliderIsInViewport() {
-        const slideContainerArray = betogether.getElementsArray( 'slide container' );
+        const slideContainerArray = betogether.getNodeList( 'slide container' );
         let result = '';
         if ( dpTools.ns( slideContainerArray ) ) {
             let slideContainer = slideContainerArray[0];
@@ -72,7 +72,7 @@ const betogether = {
         return result;
     },
     getLastPauseType() {
-        const pauseButtonArray = betogether.getElementsArray( 'pause button' );
+        const pauseButtonArray = betogether.getNodeList( 'pause button' );
         if ( dpTools.ns( pauseButtonArray ) ) {
             result = '';
             let pauseButton = pauseButtonArray[0];
@@ -106,8 +106,8 @@ const betogether = {
             betogether.toggleSliderPausePlay( 'play', 'null' );
         }
     },
-    togglePauseButton( action, pauseType ) {
-        const pauseButtonArray = betogether.getElementsArray( 'pause button' );
+    togglePauseButtonAndRecordPauseType( action, pauseType ) {
+        const pauseButtonArray = betogether.getNodeList( 'pause button' );
         if ( dpTools.ns( pauseButtonArray ) ) {
             let pauseButton = pauseButtonArray[0];
             dpTools.toggleButton( pauseButton, action );
@@ -120,7 +120,7 @@ const betogether = {
         }
     },
     getLastPauseType() {
-        const pauseButtonArray = betogether.getElementsArray( 'pause button' );
+        const pauseButtonArray = betogether.getNodeList( 'pause button' );
         if ( dpTools.ns( pauseButtonArray ) ) {
             let pauseButton = pauseButtonArray[0];
             return ( dpTools.nn( pauseButton.dataset.last_pause_type ) ) ? pauseButton.dataset.last_pause_type : 'nonclick';
@@ -134,27 +134,28 @@ const betogether = {
             if ( 
                 pauseType === 'click' ||
                 pauseType === 'null' ||
-                betogether.beginNonclickPause( pauseType ) == 'yes'
+                beginNonclickPause( pauseType ) === 'yes'
             ) {
                 result = 'pause slider';
             }
         }
         if ( result === 'pause slider' ) {
-            betogether.stopSlider( pauseType );
+            clearInterval( betogetherSlideTimer );
+            betogether.togglePauseButtonAndRecordPauseType( 'on', pauseType );
         } else if ( result === 'play slider' ) {
             betogether.startSlideTimer();
         }
-    },
-    beginNonclickPause( pauseType ) {
-        return (
-            dpTools.stringContains( pauseType, 'nonclick' ) === 'yes' &&
-            betogether.isSliderPlaying() === 'yes'
-        ) ?
-        'yes' :
-        'no' ;
+        function beginNonclickPause( pauseType ) {
+            return (
+                dpTools.stringContains( pauseType, 'nonclick' ) === 'yes' &&
+                betogether.isSliderPlaying() === 'yes'
+            ) ?
+            'yes' :
+            'no' ;
+        }
     },
     isSliderPlaying() {
-        const pauseButtonArray = betogether.getElementsArray( 'pause button' );
+        const pauseButtonArray = betogether.getNodeList( 'pause button' );
         let result = 'no';
         if ( dpTools.ns( pauseButtonArray ) ) {
             let pauseButton = pauseButtonArray[0];
@@ -162,72 +163,69 @@ const betogether = {
         }
         return result;
     },
-    stopSlider( type ) {
-        clearInterval( betogetherSlideTimer );
-        betogether.togglePauseButton( 'on', type );
-    },
     startSlideTimer() {
-        const activeSlideArray = betogether.getElementsArray( 'active slide' );
+        const activeSlideArray = betogether.getNodeList( 'active slide' );
         if ( dpTools.ns( activeSlideArray ) ) {
-            betogether.togglePauseButton( 'off', betogether.getLastPauseType() );
-            let currentSlide = activeSlideArray[0];
+            betogether.togglePauseButtonAndRecordPauseType( 'off', betogether.getLastPauseType() );
+            const currentSlide = activeSlideArray[0];
             const totalDuration = Number( currentSlide.dataset.duration );
-            let startPosition = betogether.resumeOrPlayFromStart( currentSlide.id );
-            let startTimestamp = betogether.getStartTime( startPosition );
-            betogether.updateProgressBarLength( betogether.getProgressBarStartTime( startPosition ), totalDuration);
+            const startPosition = resumeOrPlayFromStart( currentSlide.id );
+            const startTimestamp = getStartTime( startPosition );
+            updateProgressBarLength( getProgressBarStartTime( startPosition ), totalDuration);
             betogetherSlideTimer = setInterval( function() {
-                let timestamp = Date.now();
-                let elapsedTime = timestamp - startTimestamp;
-                betogether.updateProgressBarLength( elapsedTime, totalDuration );
+                const nowTimestamp = Date.now();
+                const elapsedTime = nowTimestamp - startTimestamp;
+                updateProgressBarLength( elapsedTime, totalDuration );
                 if ( elapsedTime >= totalDuration ) {
                     betogether.toggleSliderPausePlay( 'pause', 'null' );
                     betogether.nextSlide();
                 }
             }, 20);
         }
-    },
-    getStartTime( startPosition ) {
-        let startTimestamp = Date.now();
-        return ( startPosition === 'play-from-start' ) ? startTimestamp : startTimestamp - betogether.getProgressBarElapsedTime();
-    },
-    getProgressBarStartTime( startPosition ) {
-        return ( startPosition === 'play-from-start' ) ? 0 : betogether.getProgressBarElapsedTime();
-    },
-    resumeOrPlayFromStart( currentSlideButtonID ) {
-        const progressBarArray = betogether.getElementsArray( 'progress bar' );
-        let result = 'play-from-start';
-        if ( dpTools.ns( progressBarArray ) ) {
-            let progressbar = progressBarArray[0];
-            if ( dpTools.nn( progressbar.dataset.last_slide_button_id ) ) {
-                result = ( progressbar.dataset.last_slide_button_id === currentSlideButtonID ) ? 'resume' : result;
-            }
-            progressbar.dataset.last_slide_button_id = currentSlideButtonID;
-        }    
-        return result;
-    },
-    getProgressBarElapsedTime() {
-        const progressBarArray = betogether.getElementsArray( 'progress bar' );
-        if ( dpTools.ns( progressBarArray ) ) {
-            let progressbar = progressBarArray[0];
-            return ( dpTools.nn( progressbar.dataset.elapsed_time ) ) ? Number( progressbar.dataset.elapsed_time ) : 0;
+        function getStartTime( startPosition ) {
+            let startTimestamp = Date.now();
+            return ( startPosition === 'play-from-start' ) ? startTimestamp : startTimestamp - getProgressBarElapsedTime();
         }
-    },
-    updateProgressBarLength( elapsedTime, totalDuration ) {
-        const progressBarArray = betogether.getElementsArray( 'progress bar' );
-        if ( dpTools.ns( progressBarArray ) ) {
-            let progressbar = progressBarArray[0];
-            progressbar.style.width = ( ( elapsedTime / totalDuration ) * 100 ).toFixed(2) + '%';
-            progressbar.dataset.elapsed_time = elapsedTime;
+        function getProgressBarStartTime( startPosition ) {
+            return ( startPosition === 'play-from-start' ) ? 0 : getProgressBarElapsedTime();
+        }
+        function resumeOrPlayFromStart( currentSlideButtonID ) {
+            const progressBarArray = betogether.getNodeList( 'progress bar' );
+            let result = 'play-from-start';
+            if ( dpTools.ns( progressBarArray ) ) {
+                let progressbar = progressBarArray[0];
+                if ( dpTools.nn( progressbar.dataset.last_slide_button_id ) ) {
+                    result = ( progressbar.dataset.last_slide_button_id === currentSlideButtonID ) ? 'resume' : result;
+                }
+                progressbar.dataset.last_slide_button_id = currentSlideButtonID;
+            }    
+            return result;
+        }
+        function getProgressBarElapsedTime() {
+            const progressBarArray = betogether.getNodeList( 'progress bar' );
+            if ( dpTools.ns( progressBarArray ) ) {
+                let progressbar = progressBarArray[0];
+                return ( dpTools.nn( progressbar.dataset.elapsed_time ) ) ? Number( progressbar.dataset.elapsed_time ) : 0;
+            }
+        }
+        function updateProgressBarLength( elapsedTime, totalDuration ) {
+            const progressBarArray = betogether.getNodeList( 'progress bar' );
+            if ( dpTools.ns( progressBarArray ) ) {
+                let progressbar = progressBarArray[0];
+                progressbar.style.width = ( ( elapsedTime / totalDuration ) * 100 ).toFixed(2) + '%';
+                progressbar.dataset.elapsed_time = elapsedTime;
+            }
         }
     },
     nextSlide() {
-        const slideButtonArray = betogether.getElementsArray( 'all slide buttons' );
-        const activeSlideButtonArray = betogether.getElementsArray( 'active slide button' );
-        const slideArray = betogether.getElementsArray( 'all slides' );
+        const slideButtonArray = betogether.getNodeList( 'all slide buttons' );
+        const activeSlideButtonArray = betogether.getNodeList( 'active slide button' );
+        const slideArray = betogether.getNodeList( 'all slides' );
         if ( dpTools.ns( activeSlideButtonArray ) && dpTools.ns( slideButtonArray ) ) {
             let currentSlideButton = activeSlideButtonArray[0];
             let currentSlideNumber = ( dpTools.nn( currentSlideButton.dataset.slide ) ) ? Number( currentSlideButton.dataset.slide ) : 1;
-            let nextSlideNumber = dpTools.getNextInArray( currentSlideNumber, slideButtonArray, 1 );
+            let arrayPosition = currentSlideNumber - 1;
+            let nextSlideNumber = dpTools.getNextInArray( arrayPosition, slideButtonArray ) + 1;
             slideButtonArray.forEach(element => {
                 if ( element.id == 'betogether-control-' + nextSlideNumber ) {
                     betogether.startThisSlide( element );
@@ -236,8 +234,8 @@ const betogether = {
         }
     },
     startThisSlide( slideButton ) {
-        const slideButtonArray = betogether.getElementsArray( 'all slide buttons' );
-        const slideArray = betogether.getElementsArray( 'all slides' );
+        const slideButtonArray = betogether.getNodeList( 'all slide buttons' );
+        const slideArray = betogether.getNodeList( 'all slides' );
         betogether.toggleSliderPausePlay( 'pause', 'null' )
         for (let i = 0; i < slideButtonArray.length; i++) {
             if ( slideButtonArray[i].id === slideButton.id ) {
@@ -250,7 +248,7 @@ const betogether = {
         }
         betogether.startSlideTimer();
     },
-    getElementsArray( query ) {
+    getNodeList( query ) {
         let array = [];
         let queryObject = {
             'active slide button' : 'a.betogether-slide-button[aria-pressed="true"]',
@@ -267,10 +265,10 @@ const betogether = {
 };
 
 const dpTools = {
-    ns( array ) { /* Nodelist Set */
+    ns( array ) { /* Nodelist Set: used as a way to reduce errors when calling elements */
         return ( array !== null && array.length > 0 ) ? true : false;
     },
-    nn( element ) { /* Not Null */
+    nn( element ) { /* Not Null, mostly used to prevent an error when calling a dataset that doesn't exist yet */
         return ( element !== null ) ? true : false;
     },
     toggleButton( button, action ) {
@@ -320,9 +318,9 @@ const dpTools = {
           element.classList.toggle( css );
         }
     },
-    getNextInArray( currentPosition, array, start ) {
-        currentPosition = Number(currentPosition);
-        return ( currentPosition + 1 <= array.length ) ? currentPosition + 1 : start;
+    getNextInArray( currentPosition, array ) {
+        currentPosition = Number( currentPosition );
+        return ( currentPosition + 1 < array.length ) ? currentPosition + 1 : 0;
     },
     getAnchorButtonStatus( button ) {
         const status = button.getAttribute( 'aria-pressed' );
