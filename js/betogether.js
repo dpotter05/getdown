@@ -25,8 +25,11 @@ const betogether = {
                     }
                 };
                 slideContainer.onmouseout = function(e) {
-                    if ( sliderMainContainer.classList.contains( 'pause-on-mouseover' ) ) {
-                        betogether.toggleSliderPausePlay( 'play', null );
+                    if ( 
+                        sliderMainContainer.classList.contains( 'pause-on-mouseover' ) &&
+                        betogether.getLastPauseType() !== 'click'
+                    ) {
+                        betogether.toggleSliderPausePlay( 'play', 'nonclick mouseover' );
                     }
                 };
             }
@@ -57,12 +60,16 @@ const betogether = {
             betogether.toggleSliderPausePlay( 'pause', 'click' );
         }
     },
-    toggleScrollListener( action ) {
-        const sliderMainContainerArray = betogether.getElementsArray( 'slider container' );
-        if ( dpTools.ns( sliderMainContainerArray ) ) {
-            let sliderMainContainer = sliderMainContainerArray[0];
-            dpTools.toggleCSS( sliderMainContainer, action, 'pause_when_viewing_another_tab' );
+    sliderIsInViewport() {
+        const slideContainerArray = betogether.getElementsArray( 'slide container' );
+        let result = '';
+        if ( dpTools.ns( slideContainerArray ) ) {
+            let slideContainer = slideContainerArray[0];
+            let pauseHeight = 0.5 * ( dpTools.getElementHeight( slideContainer ) );
+            let elementIsInViewport = dpTools.elementIsInViewport( slideContainer, ( pauseHeight ) );
+            result = ( elementIsInViewport === 'yes' ) ? 'yes' : 'no';
         }
+        return result;
     },
     getLastPauseType() {
         const pauseButtonArray = betogether.getElementsArray( 'pause button' );
@@ -76,22 +83,10 @@ const betogether = {
         }
         return result;
     },
-    sliderIsInViewport() {
-        const slideContainerArray = betogether.getElementsArray( 'slide container' );
-        let result = '';
-        if ( dpTools.ns( slideContainerArray ) ) {
-            let slideContainer = slideContainerArray[0];
-            let pauseHeight = 0.5 * ( dpTools.getElementHeight( slideContainer ) );
-            let elementIsInViewport = dpTools.elementIsInViewport( slideContainer, ( pauseHeight ) );
-            result = ( elementIsInViewport === 'yes' ) ? 'yes' : 'no';
-        }
-        return result;
-    },
     tabIsInBackgroundListener() {
         document.onvisibilitychange = function( e ) {
             let lastPauseType = betogether.getLastPauseType();
-            let sliderIsPlaying = betogether.isSliderPlaying();
-            if ( sliderIsPlaying === 'yes' ) {
+            if ( betogether.isSliderPlaying() === 'yes' ) {
                 betogether.toggleSliderPausePlay( 'pause', 'click' );
             }
         };
@@ -108,7 +103,7 @@ const betogether = {
         if ( dpTools.getAnchorButtonStatus( pauseButton ) === 'off' ) {
             betogether.toggleSliderPausePlay( 'pause', 'click' );
         } else {
-            betogether.toggleSliderPausePlay( 'play', null );
+            betogether.toggleSliderPausePlay( 'play', 'null' );
         }
     },
     togglePauseButton( action, pauseType ) {
@@ -117,7 +112,7 @@ const betogether = {
             let pauseButton = pauseButtonArray[0];
             dpTools.toggleButton( pauseButton, action );
             if ( 
-                pauseType !== null && 
+                pauseType !== 'null' && 
                 ( pauseType === 'click' || dpTools.stringContains( pauseType, 'nonclick' ) === 'yes' )
             ) {
                 pauseButton.dataset.last_pause_type = pauseType;
@@ -132,14 +127,13 @@ const betogether = {
         }
     },
     toggleSliderPausePlay( action, pauseType ) {
-        // pauseType null is used when action === 'play'
         let result = '';
         if ( action === 'play' ) {
             result = 'play slider';
         } else if ( action === 'pause' ) {
             if ( 
                 pauseType === 'click' ||
-                pauseType === null ||
+                pauseType === 'null' ||
                 betogether.beginNonclickPause( pauseType ) == 'yes'
             ) {
                 result = 'pause slider';
@@ -186,7 +180,7 @@ const betogether = {
                 let elapsedTime = timestamp - startTimestamp;
                 betogether.updateProgressBarLength( elapsedTime, totalDuration );
                 if ( elapsedTime >= totalDuration ) {
-                    betogether.toggleSliderPausePlay( 'pause', null );
+                    betogether.toggleSliderPausePlay( 'pause', 'null' );
                     betogether.nextSlide();
                 }
             }, 20);
@@ -244,7 +238,7 @@ const betogether = {
     startThisSlide( slideButton ) {
         const slideButtonArray = betogether.getElementsArray( 'all slide buttons' );
         const slideArray = betogether.getElementsArray( 'all slides' );
-        betogether.toggleSliderPausePlay( 'pause', null )
+        betogether.toggleSliderPausePlay( 'pause', 'null' )
         for (let i = 0; i < slideButtonArray.length; i++) {
             if ( slideButtonArray[i].id === slideButton.id ) {
                 dpTools.toggleButton( slideButtonArray[i], 'on' );
