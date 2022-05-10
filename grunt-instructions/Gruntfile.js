@@ -7,11 +7,11 @@ module.exports = function(grunt) {
         concat: {   
             dist: {
                 src: [
-                    '../js/components/betogetherPreproduction.js',
+                    '../js/components/getdownPreproduction.js',
                     '../js/components/dpTools.js',
                     '../js/components/onload.js',
                 ],
-                dest: '../js/betogether.js',
+                dest: '../js/getdown.js',
             }
         }
 

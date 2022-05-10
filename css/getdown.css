@@ -1,18 +1,18 @@
-#betogether-container {
-  --bt-button-size: 40px;
-  --bt-button-border-width: 4px;
-  --bt-button-margin-x: 20px;
-  --bt-button-margin-y: 20px;
-  --bt-controls-container-height: calc(var(--bt-button-size) + 2 * var(--bt-button-margin-y));
-  --bt-margin-bottom: calc(40px - 7px);
+#getdown-container {
+  --gd-button-size: 40px;
+  --gd-button-border-width: 4px;
+  --gd-button-margin-x: 20px;
+  --gd-button-margin-y: 20px;
+  --gd-controls-container-height: calc(var(--gd-button-size) + 2 * var(--gd-button-margin-y));
+  --gd-margin-bottom: calc(40px - 7px);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin: 40px auto var(--bt-margin-bottom) auto;
+  margin: 40px auto var(--gd-margin-bottom) auto;
   overflow: hidden;
 }
 
-#betogether-slide-container {
+#getdown-slide-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,7 +22,7 @@
   width: 100%;
 }
 
-#betogether-container.pause-on-mouseover #betogether-slide-container::before {
+#getdown-container.pause-on-mouseover #getdown-slide-container::before {
   content: "";
   position: absolute;
   height: 100%;
@@ -32,15 +32,15 @@
   z-index: 2;
 }
 
-.betogether-slide {
-  animation: betogether-in-from-right 0.25s ease-out;
+.getdown-slide {
+  animation: getdown-in-from-right 0.25s ease-out;
   display: flex;
   left: 0;
   opacity: 1;
   position: relative;
 }
 
-@keyframes betogether-in-from-right {
+@keyframes getdown-in-from-right {
   0% {
     left: 30px;
     opacity: 0;
@@ -50,16 +50,16 @@
     opacity: 1;
   }
 }
-.betogether-slide.off {
+.getdown-slide.off {
   display: none;
 }
 
-.betogether-slide img {
+.getdown-slide img {
   height: auto;
   width: 100%;
 }
 
-.betogether-slide p {
+.getdown-slide p {
   background-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75), transparent);
   box-sizing: border-box;
   color: white;
@@ -76,7 +76,7 @@
   width: 80%;
 }
 
-#betogether-progress-bar-container {
+#getdown-progress-bar-container {
   background-color: #999;
   height: 6px;
   margin-top: 2px;
@@ -84,7 +84,7 @@
   width: 100%;
 }
 
-#betogether-progress-bar {
+#getdown-progress-bar {
   background-color: #111;
   top: 0;
   height: 6px;
@@ -94,25 +94,25 @@
   width: 100%;
 }
 
-#betogether-controls-container {
+#getdown-controls-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: var(--bt-controls-container-height);
+  height: var(--gd-controls-container-height);
   width: 100%;
 }
 
-.betogether-slide-button {
+.getdown-slide-button {
   background-color: #111;
   border-radius: 50%;
   display: block;
-  height: var(--bt-button-size);
-  margin-right: var(--bt-button-margin-x);
+  height: var(--gd-button-size);
+  margin-right: var(--gd-button-margin-x);
   position: relative;
-  width: var(--bt-button-size);
+  width: var(--gd-button-size);
 }
 
-.betogether-slide-button::before {
+.getdown-slide-button::before {
   content: "";
   position: absolute;
   background-color: #fff;
@@ -123,97 +123,97 @@
   width: calc(100% - 8px);
 }
 
-.betogether-slide-button[aria-pressed=true]::before {
+.getdown-slide-button[aria-pressed=true]::before {
   background-color: #000;
 }
 
-#betogether-pause-button {
+#getdown-pause-button {
   display: block;
   background-color: #111;
-  border-radius: calc(0.18 * var(--bt-button-size));
-  height: var(--bt-button-size);
+  border-radius: calc(0.18 * var(--gd-button-size));
+  height: var(--gd-button-size);
   margin-right: 0;
   position: relative;
-  width: var(--bt-button-size);
+  width: var(--gd-button-size);
 }
 
-#betogether-pause-button::before,
-#betogether-pause-button::after {
+#getdown-pause-button::before,
+#getdown-pause-button::after {
   content: "";
   position: absolute;
   background-color: #fff;
-  border-radius: calc(0.1 * var(--bt-button-size));
-  height: calc(100% - 2 * var(--bt-button-border-width));
-  top: var(--bt-button-border-width);
-  width: calc(50% - 1.5 * var(--bt-button-border-width));
+  border-radius: calc(0.1 * var(--gd-button-size));
+  height: calc(100% - 2 * var(--gd-button-border-width));
+  top: var(--gd-button-border-width);
+  width: calc(50% - 1.5 * var(--gd-button-border-width));
 }
 
-#betogether-pause-button::before {
-  left: var(--bt-button-border-width);
+#getdown-pause-button::before {
+  left: var(--gd-button-border-width);
 }
 
-#betogether-pause-button::after {
-  right: var(--bt-button-border-width);
+#getdown-pause-button::after {
+  right: var(--gd-button-border-width);
 }
 
-#betogether-pause-button svg {
+#getdown-pause-button svg {
   display: none;
   height: calc(100% - 8px);
-  left: calc(-6% + var(--bt-button-border-width));
+  left: calc(-6% + var(--gd-button-border-width));
   position: absolute;
-  top: var(--bt-button-border-width);
+  top: var(--gd-button-border-width);
   width: calc(100% - 8px);
 }
 
-#betogether-pause-button[aria-pressed=true] svg {
+#getdown-pause-button[aria-pressed=true] svg {
   display: block;
 }
 
-#betogether-pause-button[aria-pressed=true]::before,
-#betogether-pause-button[aria-pressed=true]::after {
+#getdown-pause-button[aria-pressed=true]::before,
+#getdown-pause-button[aria-pressed=true]::after {
   display: none;
 }
 
 @media only screen and (max-width: 768px) {
-  #betogether-container {
-    --bt-button-size: 30px;
-    --bt-button-border-width: 3px;
-    --bt-button-margin-x: 14px;
-    --bt-button-margin-y: 14px;
+  #getdown-container {
+    --gd-button-size: 30px;
+    --gd-button-border-width: 3px;
+    --gd-button-margin-x: 14px;
+    --gd-button-margin-y: 14px;
   }
 
-  .betogether-slide p {
+  .getdown-slide p {
     font-size: 0.9rem;
     letter-spacing: 0.05rem;
   }
 }
-#betogether-polaroid-container {
+#getdown-polaroid-container {
   display: none;
 }
 
-#betogether-container.polaroid_style {
-  --bt-margin-bottom-polaroid: calc(var(--bt-margin-bottom) + 0px + var(--bt-controls-container-height) + 6px + 2px);
+#getdown-container.polaroid_style {
+  --gd-margin-bottom-polaroid: calc(var(--gd-margin-bottom) + 0px + var(--gd-controls-container-height) + 6px + 2px);
   background-color: white;
   height: calc(var(--polaroid-style-width) * 1.2219959267);
   justify-content: center;
   position: relative;
   width: var(--polaroid-style-width);
   overflow: visible;
-  margin-bottom: var(--bt-margin-bottom-polaroid);
+  margin-bottom: var(--gd-margin-bottom-polaroid);
 }
-#betogether-container.polaroid_style #betogether-slide-container {
+#getdown-container.polaroid_style #getdown-slide-container {
   position: absolute;
   top: 0.1%;
   width: 100%;
 }
-#betogether-container.polaroid_style .betogether-slide {
+#getdown-container.polaroid_style .getdown-slide {
   height: calc(0.75 * var(--polaroid-style-width) * 1.2219959267);
   left: calc(0.065 * var(--polaroid-style-width));
   position: absolute;
   top: calc(0.05 * var(--polaroid-style-width) * 1.2219959267);
   width: calc(0.87 * var(--polaroid-style-width));
 }
-#betogether-container.polaroid_style .betogether-slide::before {
+#getdown-container.polaroid_style .getdown-slide::before {
   background-image: url("../img/polaroid.png");
   background-position: center center;
   background-repeat: no-repeat;
@@ -228,20 +228,20 @@
   width: 114%;
   z-index: 1;
 }
-#betogether-container.polaroid_style .betogether-slide img {
+#getdown-container.polaroid_style .getdown-slide img {
   height: auto;
   object-fit: cover;
   object-position: center top;
   width: 100%;
 }
-#betogether-container.polaroid_style .betogether-slide p {
+#getdown-container.polaroid_style .getdown-slide p {
   background-image: none;
   bottom: -17%;
   color: #111;
   font-size: 0.9rem;
   z-index: 1;
 }
-#betogether-container.polaroid_style #betogether-polaroid-container {
+#getdown-container.polaroid_style #getdown-polaroid-container {
   height: 100%;
   display: block;
   margin: 0 !important;
@@ -252,18 +252,18 @@
   width: 100%;
   z-index: -1;
 }
-#betogether-container.polaroid_style #betogether-polaroid-container img {
+#getdown-container.polaroid_style #getdown-polaroid-container img {
   height: auto;
   opacity: 0;
   width: 100%;
 }
-#betogether-container.polaroid_style #betogether-progress-bar-container {
+#getdown-container.polaroid_style #getdown-progress-bar-container {
   bottom: -8px;
   position: absolute;
   left: 30%;
   width: 40%;
 }
-#betogether-container.polaroid_style #betogether-controls-container {
-  bottom: calc(-1 * (var(--bt-controls-container-height) + 6px + 2px));
+#getdown-container.polaroid_style #getdown-controls-container {
+  bottom: calc(-1 * (var(--gd-controls-container-height) + 6px + 2px));
   position: absolute;
 }

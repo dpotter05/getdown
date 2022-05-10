@@ -1,51 +1,51 @@
 /* jslint browser */
-/*global window, document, betogetherSlideTimer, clearInterval, setInterval */
+/*global window, document, getdownSlideTimer, clearInterval, setInterval */
 
-const betogether = {
+const getdown = {
     addListeners() {
         dpTools.addAnchorButtonListeners(
-            "a.betogether-slide-button",
-            betogether, "slideButtonEvent"
+            "a.getdown-slide-button",
+            getdown, "slideButtonEvent"
         );
         dpTools.addAnchorButtonListeners(
-            "a#betogether-pause-button",
-            betogether, "pauseButtonEvent"
+            "a#getdown-pause-button",
+            getdown, "pauseButtonEvent"
         );
-        betogether.pause_on_scroll();
-        betogether.tabIsInBackgroundListener();
+        getdown.pause_on_scroll();
+        getdown.tabIsInBackgroundListener();
     },
     getLastPauseType() {
-        return betogether.gn( "pause button" )?.dataset.last_pause_type || "";
+        return getdown.gn( "pause button" )?.dataset.last_pause_type || "";
     },
     gn( query ) { // Get Node
         let queryObject = {
-            "active slide" : ".betogether-slide:not(.off)",
+            "active slide" : ".getdown-slide:not(.off)",
             "active slide button" :
-                ".betogether-slide-button[aria-pressed='true']",
-            "pause button" : "#betogether-pause-button",
-            "progress bar" : "#betogether-progress-bar",
-            "slide container" : "#betogether-slide-container",
-            "slider container" : "#betogether-container"
+                ".getdown-slide-button[aria-pressed='true']",
+            "pause button" : "#getdown-pause-button",
+            "progress bar" : "#getdown-progress-bar",
+            "slide container" : "#getdown-slide-container",
+            "slider container" : "#getdown-container"
         };
         return document.querySelector( queryObject[ query ] );
     },
     gnl( query ) { // Get Node List
         let queryObject = {
-            "all slide buttons" : ".betogether-slide-button",
-            "all slides" : ".betogether-slide"
+            "all slide buttons" : ".getdown-slide-button",
+            "all slides" : ".getdown-slide"
         };
         return document.querySelectorAll( queryObject[ query ] );
     },
     isSliderPlaying() {
-        const pauseButton = betogether.gn( "pause button" );
+        const pauseButton = getdown.gn( "pause button" );
         return (
             pauseButton &&
             dpTools.getButtonStatus( pauseButton ) === "off"
         ) ? "yes" : "no";
     },
     nextSlide() {
-        const activeSlideButton = betogether.gn( "active slide button" );
-        const slideButtonArray = betogether.gnl( "all slide buttons" );
+        const activeSlideButton = getdown.gn( "active slide button" );
+        const slideButtonArray = getdown.gnl( "all slide buttons" );
         if (
             activeSlideButton &&
             dpTools.ns( slideButtonArray )
@@ -57,8 +57,8 @@ const betogether = {
                     slideButtonArray
                 ) + 1;
             slideButtonArray.forEach( ( element ) => {
-                if ( element.id == "betogether-control-" + nextSlideNumber ) {
-                    betogether.startThisSlide( element );
+                if ( element.id == "getdown-control-" + nextSlideNumber ) {
+                    getdown.startThisSlide( element );
                 }
             });
         }
@@ -67,20 +67,20 @@ const betogether = {
         e.preventDefault();
         const pauseButton = document.activeElement;
         if ( dpTools.getAnchorButtonStatus( pauseButton ) === "off" ) {
-            betogether.toggleSliderPausePlay( "pause", "click" );
+            getdown.toggleSliderPausePlay( "pause", "click" );
         } else {
-            betogether.toggleSliderPausePlay( "play", "null" );
+            getdown.toggleSliderPausePlay( "play", "null" );
         }
     },
     pause_on_scroll() {
         window.onscroll = function ( e ) {
-            const sliderMainContainer = betogether.gn( "slider container" );
+            const sliderMainContainer = getdown.gn( "slider container" );
             if ( sliderMainContainer ) {
                 if ( sliderMainContainer.classList.contains(
                         "pause_on_scroll"
                     )
                 ) {
-                    betogether.toggleSliderPausePlay( "pause", "click" );
+                    getdown.toggleSliderPausePlay( "pause", "click" );
                 }
             }
         };
@@ -88,10 +88,10 @@ const betogether = {
     slideButtonEvent( e ) {
         e.preventDefault();
         const slideButton = document.activeElement;
-        betogether.startThisSlide( slideButton );
+        getdown.startThisSlide( slideButton );
     },
     sliderIsInViewport() {
-        const slideContainer = betogether.gn( "slide container" );
+        const slideContainer = getdown.gn( "slide container" );
         let result = "yes";
         if ( slideContainer ) {
             let pauseHeight = 0.5 *
@@ -105,11 +105,11 @@ const betogether = {
         return result;
     },
     startSlideTimer() {
-        const activeSlide = betogether.gn( "active slide" );
+        const activeSlide = getdown.gn( "active slide" );
         if ( activeSlide ) {
-            betogether.togglePauseButtonAndRecordPauseType(
+            getdown.togglePauseButtonAndRecordPauseType(
                 "off",
-                betogether.getLastPauseType()
+                getdown.getLastPauseType()
             );
             const totalDuration = Number( activeSlide?.dataset.duration || "" );
             const startPosition = resumeOrPlayFromStart( activeSlide.id );
@@ -118,13 +118,13 @@ const betogether = {
                 getProgressBarStartTime( startPosition ),
                 totalDuration
             );
-            betogetherSlideTimer = setInterval( function() {
+            getdownSlideTimer = setInterval( function() {
                 const nowTimestamp = Date.now();
                 const elapsedTime = nowTimestamp - startTimestamp;
                 updateProgressBarLength( elapsedTime, totalDuration );
                 if ( elapsedTime >= totalDuration ) {
-                    betogether.toggleSliderPausePlay( "pause", "null" );
-                    betogether.nextSlide();
+                    getdown.toggleSliderPausePlay( "pause", "null" );
+                    getdown.nextSlide();
                 }
             }, 20);
         }
@@ -140,17 +140,17 @@ const betogether = {
                 getProgressBarElapsedTime();
         }
         function resumeOrPlayFromStart( currentID ) {
-            const progressBar = betogether.gn( "progress bar" );
+            const progressBar = getdown.gn( "progress bar" );
             let lastID = progressBar?.dataset.last_slide_button_id || "";
             progressBar.dataset.last_slide_button_id = currentID;
             return ( lastID === currentID ) ? "resume" : "play-from-start";
         }
         function getProgressBarElapsedTime() {
-            const progressBar = betogether.gn( "progress bar" );
+            const progressBar = getdown.gn( "progress bar" );
             return Number( progressBar?.dataset.elapsed_time || 0 );
         }
         function updateProgressBarLength( elapsedTime, totalDuration ) {
-            const progressBar = betogether.gn( "progress bar" );
+            const progressBar = getdown.gn( "progress bar" );
             if ( progressBar ) {
                 let rateDone = elapsedTime / totalDuration;
                 let percentDone = dpTools.convertRateToPercent( rateDone );
@@ -160,13 +160,13 @@ const betogether = {
         }
     },
     startSlider() {
-        betogether.addListeners();
-        betogether.startSlideTimer();
+        getdown.addListeners();
+        getdown.startSlideTimer();
     },
     startThisSlide( slideButton ) {
-        const slideButtonArray = betogether.gnl( "all slide buttons" );
-        const slideArray = betogether.gnl( "all slides" );
-        betogether.toggleSliderPausePlay( "pause", "null" );
+        const slideButtonArray = getdown.gnl( "all slide buttons" );
+        const slideArray = getdown.gnl( "all slides" );
+        getdown.toggleSliderPausePlay( "pause", "null" );
         if ( dpTools.ns( slideButtonArray ) && dpTools.ns( slideArray ) ) {
             let i;
             for ( i = 0; i < slideButtonArray.length; i += 1 ) {
@@ -178,18 +178,18 @@ const betogether = {
                     dpTools.toggleCSS( slideArray[i], "add", "off" );
                 }
             }
-            betogether.startSlideTimer();
+            getdown.startSlideTimer();
         }
     },
     tabIsInBackgroundListener() {
         document.onvisibilitychange = function( e ) {
-            if ( betogether.isSliderPlaying() === "yes" ) {
-                betogether.toggleSliderPausePlay( "pause", "click" );
+            if ( getdown.isSliderPlaying() === "yes" ) {
+                getdown.toggleSliderPausePlay( "pause", "click" );
             }
         };
     },
     togglePauseButtonAndRecordPauseType( action, pauseType ) {
-        const pauseButton = betogether.gn( "pause button" );
+        const pauseButton = getdown.gn( "pause button" );
         if ( pauseButton ) {
             dpTools.toggleButton( pauseButton, action );
             let pauseTypeNotNull = ( pauseType !== "null" ) ? true : false;
@@ -218,15 +218,15 @@ const betogether = {
             }
         }
         if ( result === "pause slider" ) {
-            clearInterval( betogetherSlideTimer );
-            betogether.togglePauseButtonAndRecordPauseType( "on", pauseType );
+            clearInterval( getdownSlideTimer );
+            getdown.togglePauseButtonAndRecordPauseType( "on", pauseType );
         } else if ( result === "play slider" ) {
-            betogether.startSlideTimer();
+            getdown.startSlideTimer();
         }
         function beginNonclickPause( pauseType ) {
             return (
                 dpTools.stringContains( pauseType, "nonclick" ) === "yes" &&
-                betogether.isSliderPlaying() === "yes"
+                getdown.isSliderPlaying() === "yes"
             ) ?
             "yes" :
             "no" ;
@@ -334,5 +334,5 @@ const dpTools = {
 };
 
 window.onload = function() {
-    betogether.startSlider();
+    getdown.startSlider();
 };
