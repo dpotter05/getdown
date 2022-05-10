@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: Get Down Slider
+ * Plugin Name: Get Down Polaroid Slider
  * Author: David Potter
  * Author URI: https://github.com/dpotter05/getdown
  * Text Domain: getdown
- * Description: A bare-bones shortcode slider
+ * Description: A lightweight slider with an option to turn your slides into polaroid pictures.
  * Version: 1.0
  * License: GPL2
  */
@@ -140,12 +140,13 @@ if ( !function_exists( 'getdown_get_slides' ) ) {
         if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
             for ( $i = 0; $i < count( $image_urls ); $i++ ) {
                 $alt = ( !empty( $image_descriptions[$i] ) ) ? $image_descriptions[$i] : '';
+                $message = ( !empty( $messages[$i] ) ) ? $messages[$i] : '';
                 $result .= getdown_get_slide( 
                     [
                         'image_url' => $image_urls[$i], 
                         'count'     => $i,
                         'alt'       => $alt,
-                        'message'   => $messages[$i],
+                        'message'   => $message,
                         'duration'  => $durations_in_milliseconds[$i],
                     ] );
             }
@@ -186,7 +187,7 @@ if ( !function_exists( 'getdown_get_slide' ) ) {
             $image_url = trim( esc_url( $image_url ) );
             $alt = ( !empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
             $message = ( !empty($args['message'] ) ) ? trim( sanitize_text_field( $args['message'] ) ) : '';
-            $message = ( $message == '-' ) ? "" : '<p>' . $message . '</p>';
+            $message = ( $message == '-' || $message == '' ) ? '' : '<p>' . $message . '</p>';
             $duration = ( !empty( $args['duration'] ) ) ? trim( $args['duration'] ) : '4000';
             $result .= <<<HERE
             <div id="getdown-slide-{$count}" class="getdown-slide{$offCSS}" data-duration="{$duration}">
