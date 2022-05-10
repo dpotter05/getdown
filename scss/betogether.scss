@@ -1,6 +1,8 @@
-$betogether-progress-bar-color: black;
-$betogether-progress-bar-height: 2px;
-$betogether-progress-bar-margin: 2px;
+$bt-margin-y: 40px;
+$bt-progress-bar-color: black;
+$bt-progress-bar-color-background: #999;
+$bt-progress-bar-height: 6px;
+$bt-progress-bar-top-margin: 2px;
 $bt-button-border-color: #111;
 $bt-button-border-width: 4px;
 $bt-button-color: #fff;
@@ -10,6 +12,15 @@ $bt-button-margin-x: 20px;
 $bt-button-margin-y: 20px;
 $bt-button-size: 40px;
 $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
+$bt-controls-container-height: calc($bt-button-size + 2 * $bt-button-margin-y);
+$bt-polaroid-height-to-width-ratio: calc(6 / 4.91);
+$bt-polaroid-width: var(--polaroid-style-width);
+$bt-polaroid-height: calc($bt-polaroid-width * $bt-polaroid-height-to-width-ratio);
+$bt-polaroid-border-color1: rgba(255, 255, 255, .05);
+$bt-polaroid-border-color2: rgba(0, 0, 0, 0.05);
+$bt-polaroid-y-offset: 16.25%;
+$bt-polaroid-x-offset: 7%;
+$bt-polaroid-background-color: white;
 @mixin flex_center {
     display: flex;
     justify-content: center;
@@ -27,12 +38,10 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
     left: 0;
 }
 #betogether-container {
-    background-color: rgba(0, 0, 0, 0.2);
-    border:1px solid rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    margin: 40px auto;
+    margin: $bt-margin-y auto;
     overflow: hidden;
 }
 #betogether-slide-container {
@@ -45,7 +54,7 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
 #betogether-container.pause-on-mouseover {
     #betogether-slide-container::before {
         @include pseudo2;
-        z-index:1;
+        z-index:2;
     }
 }
 .betogether-slide {
@@ -96,15 +105,16 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
     width: 80%;
 }
 #betogether-progress-bar-container {
-    background-color: #999;
-    height: calc( $betogether-progress-bar-height + 2 * $betogether-progress-bar-margin);
+    background-color: $bt-progress-bar-color-background;
+    height: $bt-progress-bar-height;
+    margin-top: $bt-progress-bar-top-margin;
     position: relative;
     width: 100%;
 }
 #betogether-progress-bar {
-    background-color: $betogether-progress-bar-color;
-    top: calc(50% - .5 * $betogether-progress-bar-height);
-    height: $betogether-progress-bar-height;
+    background-color: $bt-progress-bar-color;
+    top: 0;
+    height: $bt-progress-bar-height;
     left: 0;
     position: absolute;
     transform-origin: 0 0;
@@ -112,7 +122,7 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
 }
 #betogether-controls-container {
     @include flex_center;
-    height: calc($bt-button-size + 2 * $bt-button-margin-y);
+    height: $bt-controls-container-height;
     width: 100%;
 }
 .betogether-slide-button {
@@ -139,13 +149,12 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
 #betogether-pause-button {
     display: block;
     background-color: $bt-button-border-color;
-    border-radius: calc(.15 * $bt-button-size);
+    border-radius: calc(.18 * $bt-button-size);
     height: $bt-button-size;
     margin-right: 0;
     position: relative;
     width: $bt-button-size;
 }
-
 #betogether-pause-button::before,
 #betogether-pause-button::after {
     @include pseudo1;
@@ -155,14 +164,12 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
     top: $bt-button-border-width;
     width: calc(50% - 1.5 * $bt-button-border-width);
 }
-
 #betogether-pause-button::before {
     left: $bt-button-border-width;
 }
 #betogether-pause-button::after {
     right: $bt-button-border-width;
 }
-
 #betogether-pause-button svg {
     display: none;
     height: $bt-pause-button-size;
@@ -178,7 +185,6 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
 #betogether-pause-button[aria-pressed="true"]::after {
     display:none;
 }
-
 @media only screen and (max-width:768px) {
     .betogether-slide p {
         font-size: 0.9rem;
@@ -191,4 +197,81 @@ $bt-pause-button-size: calc(100% - 2 * $bt-button-border-width);
         $bt-button-size: 30px;
     }
 }
-
+#betogether-polaroid-container {
+    display: none;
+}
+#betogether-container.polaroid_style {
+    background-color: $bt-polaroid-background-color;
+    height: $bt-polaroid-height;
+    justify-content: center;
+    position: relative;
+    width: $bt-polaroid-width;
+    overflow: visible;
+    margin: $bt-margin-y auto calc($bt-margin-y + $bt-progress-bar-height + $bt-progress-bar-top-margin + 3px + $bt-controls-container-height) auto;
+    #betogether-slide-container {
+        position:absolute;
+        top: 0.1%;
+        width:100%;
+    }
+    .betogether-slide {
+        height: calc(0.75 * $bt-polaroid-height);
+        left: calc(0.065 * $bt-polaroid-width);
+        position: absolute;
+        top: calc(0.05 * $bt-polaroid-height);
+        width: calc((1 - ( 2 * 0.065 )) * $bt-polaroid-width);
+    }
+    .betogether-slide::before {
+        background-image: url("../img/polaroid.png");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        border: 1px solid $bt-polaroid-border-color1;
+        border-color: $bt-polaroid-border-color1 $bt-polaroid-border-color2 $bt-polaroid-border-color2 $bt-polaroid-border-color1;
+        content: "";
+        height: calc(100% + 2 * $bt-polaroid-y-offset);
+        left: calc(-1 * $bt-polaroid-x-offset);
+        position: absolute;
+        top: -6.5%;
+        width: calc(100% + 2 * $bt-polaroid-x-offset);
+        z-index: 1;
+    }
+    .betogether-slide img {
+        height: auto;
+        object-fit: cover;
+        object-position: center top;
+        width: 100%;
+    }
+    .betogether-slide p {
+        background-image: none;
+        bottom: -17%;
+        color: black;
+        font-size: 0.9rem;
+        z-index: 1;
+    }
+    #betogether-polaroid-container {
+        height: 100%;
+        display: block;
+        margin: 0!important;
+        object-fit: cover;
+        object-position: 0 0;
+        padding: 0!important;
+        position: relative;
+        width: 100%;
+        z-index: -1;
+    }
+    #betogether-polaroid-container img {
+        height: auto;
+        opacity: 0;
+        width: 100%;
+    }
+    #betogether-progress-bar-container {
+        bottom: -8px;
+        position: absolute;
+        left: 30%;
+        width: 40%;
+    }
+    #betogether-controls-container {
+        bottom: -91px;
+        position: absolute;
+    }
+}

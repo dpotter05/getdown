@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Be Together Slider
  * Author: David Potter
- * Author URI: https://github.com/dpotter05/
+ * Author URI: https://github.com/dpotter05/betogether
  * Text Domain: betogether
  * Description: A bare-bones shortcode slider
  * Version: 1.0
@@ -31,6 +31,8 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
                 'pause_on_mouseover' => '',
                 'pause_when_viewing_another_tab' => '',
                 'pause_on_scroll' => '',
+                'polaroid_style' => '',
+                'polaroid-style-width' => '',
             ), 
             $atts, 
             'betogether'
@@ -43,15 +45,22 @@ if ( !function_exists( 'betogether_shortcode' ) ) {
 if ( !function_exists( 'betogether_get_html' ) ) {
     function betogether_get_html( $atts ) {
         $arrays = betogether_convert_input_strings_to_arrays( $atts );
-        $sliderContainerCSS = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
-        $sliderContainerCSS .= ( $arrays['pause_when_viewing_another_tab'][0] === 'yes' ) ? ' pause_when_viewing_another_tab' : '' ;
-        $sliderContainerCSS .= ( $arrays['pause_on_scroll'][0] === 'yes' ) ? ' pause_on_scroll' : '' ;
+        //$slider_container_css = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
+        $slider_container_css = ( $arrays['pause_when_viewing_another_tab'][0] === 'yes' ) ? 'pause_when_viewing_another_tab' : '';
+        $slider_container_css .= ( $arrays['pause_on_scroll'][0] === 'yes' ) ? ' pause_on_scroll' : '';
+        $slider_container_css .= ( betogether_polaroid_is_on( $arrays ) ) ? ' polaroid_style' : '';
+        $polaroid_style_width = ( 
+            betogether_polaroid_is_on( $arrays ) &&
+            !empty($arrays['polaroid-style-width'][0])
+        ) ? '--polaroid-style-width: ' . $arrays['polaroid-style-width'][0] . ';' : '';
         $slide_container = betogether_add_container(
             [
                 'id'        => 'betogether-slide-container',
                 'cssClass'  => '',
                 'content'   => betogether_get_slides( $arrays ),
                 'indent'    => 2,
+                'element'   => 'div',
+                'style'     => '',
             ]
         );
         $progress_bar_container = betogether_add_container(
@@ -60,6 +69,8 @@ if ( !function_exists( 'betogether_get_html' ) ) {
                 'cssClass'  => '',
                 'content'   => betogether_get_progress_bar(),
                 'indent'    => 2,
+                'element'   => 'div',
+                'style'     => '',
             ]
         );
         $controls_container = betogether_add_container(
@@ -68,14 +79,18 @@ if ( !function_exists( 'betogether_get_html' ) ) {
                 'content'   => betogether_get_controls( $arrays ),
                 'cssClass'  => '',
                 'indent'    => 2,
+                'element'   => 'div',
+                'style'     => '',
             ]
         );
         $slider = betogether_add_container(
             [
                 'id'        => 'betogether-container',
                 'content'   => $slide_container . $progress_bar_container . $controls_container,
-                'cssClass'  => $sliderContainerCSS,
+                'cssClass'  => $slider_container_css,
                 'indent'    => 1,
+                'element'   => 'aside',
+                'style'     => $polaroid_style_width,
             ]
         );
         return $slider;
@@ -87,6 +102,9 @@ if ( !function_exists( 'betogether_convert_input_strings_to_arrays' ) ) {
         if ( !empty( $atts ) && is_array( $atts ) ) {
             foreach ( $atts as $key => $value ) {
                 $args[$key] = betogether_get_array_from_string( [ 'string' => $atts[$key] ] );
+                if ( $key == 'polaroid-style-width') {
+                    $args[$key] = [ sanitize_text_field( $atts[$key] ) ];
+                }
             }
         }
         return $args;
@@ -116,6 +134,9 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
         $image_descriptions = ( !empty( $args['image_descriptions'] ) ) ? $args['image_descriptions'] : array();
         $messages = ( !empty( $args['messages'] ) ) ? $args['messages'] : array();
         $durations_in_milliseconds = ( !empty( $args['durations_in_milliseconds'] ) ) ? $args['durations_in_milliseconds'] : array();
+        $polaroid_style = ( betogether_polaroid_is_on( $args ) ) ?
+            betogether_get_polaroid_container() :
+            '';
         if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
             for ( $i = 0; $i < count( $image_urls ); $i++ ) {
                 $alt = ( !empty( $image_descriptions[$i] ) ) ? $image_descriptions[$i] : '';
@@ -129,7 +150,29 @@ if ( !function_exists( 'betogether_get_slides' ) ) {
                     ] );
             }
         }
+        $result = ( betogether_polaroid_is_on( $args ) ) ? $result . $polaroid_style : $result;
         return $result;
+    }
+}
+
+if ( !function_exists( 'betogether_polaroid_is_on' ) ) {
+    function betogether_polaroid_is_on( $args ) {
+        return ( !empty( $args['polaroid_style'] ) && $args['polaroid_style'][0] == "yes" ) ? true : false;
+    }
+}
+
+if ( !function_exists( 'betogether_get_polaroid_container' ) ) {
+    function betogether_get_polaroid_container() {
+        return  betogether_add_container(
+            [
+                'id'        => 'betogether-polaroid-container',
+                'content'   => '<img src="' . plugins_url() . '/betogether/img/polaroid.png" alt="Polaroid picture frame" />',
+                'cssClass'  => '',
+                'indent'    => 3,
+                'element'   => 'div',
+                'style'     => '',
+            ]
+        );
     }
 }
 
@@ -208,12 +251,14 @@ if ( !function_exists( 'betogether_add_container' ) ) {
         $cssClass = ( !empty( $args['cssClass'] ) ) ? ' class="' . $args['cssClass'] . '"' : '';
         $content = ( !empty( $args['content'] ) ) ? rtrim( $args['content'] ) : '';
         $indent = ( !empty( $args['indent'] ) && is_numeric( $args['indent'] ) ) ? $args['indent'] : '';
+        $element = ( !empty( $args['element'] ) && is_string( $args['element'] ) ) ? $args['element'] : '';
+        $style = ( !empty( $args['style'] ) && is_string( $args['style'] ) ) ? ' style="' . $args['style'] . '"' : '';
         $tab = betogether_get_tab_indentation( $indent );
         if ( !empty( $content ) ) {
             $result .= <<<HERE
 
-{$tab}<div id="{$id}"{$cssClass}>{$content}
-{$tab}</div>
+{$tab}<{$element} id="{$id}"{$cssClass}{$style}>{$content}
+{$tab}</{$element}>
 HERE;
         }
         return $result;

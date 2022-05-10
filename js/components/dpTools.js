@@ -1,10 +1,9 @@
-
 const dpTools = {
     addAnchorButtonListeners( arrayString, object, eventName ) {
         const buttonArray = document.querySelectorAll( arrayString );
         if ( dpTools.ns( buttonArray ) ) {
             buttonArray.forEach( ( element ) => {
-                element.addEventListener("click", function(e) {
+                element.addEventListener("click", function( e ) {
                     object[ eventName ]( e );
                 });
                 element.onkeydown = function( e ) {
@@ -44,6 +43,24 @@ const dpTools = {
             rect.top - rect.bottom :
             rect.bottom - rect.top;
     },
+    getKeystrokeNames( e ) {
+        let k = ( e.key === "ArrowUp" ) ? "up" : "not found";
+        k = ( e.key === "ArrowDown" ) ? "down" : k;
+        k = ( e.key === "ArrowLeft" ) ? "left" : k;
+        k = ( e.key === "ArrowRight" ) ? "right" : k;
+        k = (
+            e.key === " " ||
+            e.key === "Spacebar" ||
+            e.code === "Space"
+        ) ?
+            "spacebar" :
+            k;
+        k = ( e.key === "Enter" ) ? "enter" : k;
+        k = ( e.key === "Home" ) ? "home" : k;
+        k = ( e.key === "End" ) ? "end" : k;
+        k = ( e.key === "Escape" ) ? "escape" : k;
+        return k;
+    },
     getNextInArray( currentPosition, array ) {
         currentPosition = Number( currentPosition );
         return ( currentPosition + 1 < array.length ) ? currentPosition + 1 : 0;
@@ -52,7 +69,7 @@ const dpTools = {
         return ( element !== null ) ? true : false;
     },
     ns( array ) { // Nodelist Set
-        return ( array !== null && array.length > 0 ) ? true : false;
+        return ( array && array.length > 0 ) ? true : false;
     },
     stringContains( haystack, needle ) {
         return ( haystack.indexOf( needle ) !== -1 ) ? "yes" : "no";
@@ -77,23 +94,6 @@ const dpTools = {
         } else if (action === "toggle" ) {
           element.classList.toggle( css );
         }
-    },
-    getKeystrokeNames( e ) {
-        let k = ( e.key === "ArrowUp" ) ? "up" : "not found";
-        k = ( e.key === "ArrowDown" ) ? "down" : k;
-        k = ( e.key === "ArrowLeft" ) ? "left" : k;
-        k = ( e.key === "ArrowRight" ) ? "right" : k;
-        k = (
-            e.key === " " ||
-            e.key === "Spacebar" ||
-            e.code === "Space"
-        ) ?
-            "spacebar" :
-            k;
-        k = ( e.key === "Enter" ) ? "enter" : k;
-        k = ( e.key === "Home" ) ? "home" : k;
-        k = ( e.key === "End" ) ? "end" : k;
-        k = ( e.key === "Escape" ) ? "escape" : k;
-        return k;
     }
 };
+

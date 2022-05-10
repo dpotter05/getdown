@@ -11,109 +11,46 @@ const betogether = {
             "a#betogether-pause-button",
             betogether, "pauseButtonEvent"
         );
-        betogether.mouseoverListener();
-        betogether.scrollListener();
+        betogether.pause_on_scroll();
         betogether.tabIsInBackgroundListener();
-        betogether.startSlideTimer();
     },
     getLastPauseType() {
-        const pauseButtonArray = betogether.getNodeList( "pause button" );
-        let result = "";
-        if ( dpTools.ns( pauseButtonArray ) ) {
-            result = "";
-            let pauseButton = pauseButtonArray[0];
-            let lastPauseType = pauseButton.dataset.last_pause_type;
-            if ( dpTools.nn( lastPauseType ) ) {
-                result = lastPauseType;
-            }
-        }
-        return result;
+        return betogether.gn( "pause button" )?.dataset.last_pause_type || "";
     },
-    getNodeList( query ) {
-        let array = [];
+    gn( query ) { // Get Node
         let queryObject = {
-            "active slide" : "div.betogether-slide:not(.off)",
+            "active slide" : ".betogether-slide:not(.off)",
             "active slide button" :
-                "a.betogether-slide-button[aria-pressed='true']",
-            "all slide buttons" : "a.betogether-slide-button",
-            "all slides" : "div.betogether-slide",
-            "pause button" : "a#betogether-pause-button",
-            "progress bar" : "div#betogether-progress-bar",
-            "slide container" : "div#betogether-slide-container",
-            "slider container" : "div#betogether-container"
+                ".betogether-slide-button[aria-pressed='true']",
+            "pause button" : "#betogether-pause-button",
+            "progress bar" : "#betogether-progress-bar",
+            "slide container" : "#betogether-slide-container",
+            "slider container" : "#betogether-container"
+        };
+        return document.querySelector( queryObject[ query ] );
+    },
+    gnl( query ) { // Get Node List
+        let queryObject = {
+            "all slide buttons" : ".betogether-slide-button",
+            "all slides" : ".betogether-slide"
         };
         return document.querySelectorAll( queryObject[ query ] );
     },
     isSliderPlaying() {
-        const pauseButtonArray = betogether.getNodeList( "pause button" );
-        let result = "no";
-        if ( dpTools.ns( pauseButtonArray ) ) {
-            let pauseButton = pauseButtonArray[0];
-            result = ( dpTools.getButtonStatus( pauseButton ) === "off" ) ?
-            "yes" :
-            result;
-        }
-        return result;
-    },
-    mouseoverListener() {
-        const sliderMainContainerArray = betogether.getNodeList(
-            "slider container"
-        );
-        const slideContainerArray = betogether.getNodeList(
-            "slide container"
-        );
-        if (
-            dpTools.ns( sliderMainContainerArray ) &&
-            dpTools.ns( slideContainerArray )
-        ) {
-            let sliderMainContainer = sliderMainContainerArray[0];
-            let slideContainer = slideContainerArray[0];
-            if ( sliderMainContainer.classList.contains(
-                "pause-on-mouseover"
-                )
-            ) {
-                slideContainer.onmouseenter = function(e) {
-                    if ( sliderMainContainer.classList.contains(
-                        "pause-on-mouseover"
-                        ) ) {
-                        betogether.toggleSliderPausePlay(
-                            "pause",
-                            "nonclick mouseover"
-                        );
-                    }
-                };
-                slideContainer.onmouseout = function(e) {
-                    if (
-                        sliderMainContainer.classList.contains(
-                            "pause-on-mouseover"
-                            ) &&
-                        betogether.getLastPauseType() !== "click"
-                    ) {
-                        betogether.toggleSliderPausePlay(
-                            "play",
-                            "nonclick mouseover"
-                        );
-                    }
-                };
-            }
-        }
+        const pauseButton = betogether.gn( "pause button" );
+        return (
+            pauseButton &&
+            dpTools.getButtonStatus( pauseButton ) === "off"
+        ) ? "yes" : "no";
     },
     nextSlide() {
-        const slideButtonArray = betogether.getNodeList( "all slide buttons" );
-        const activeSlideButtonArray = betogether.getNodeList(
-            "active slide button"
-        );
-        const slideArray = betogether.getNodeList( "all slides" );
+        const activeSlideButton = betogether.gn( "active slide button" );
+        const slideButtonArray = betogether.gnl( "all slide buttons" );
         if (
-            dpTools.ns( activeSlideButtonArray ) &&
+            activeSlideButton &&
             dpTools.ns( slideButtonArray )
         ) {
-            let currentSlideButton = activeSlideButtonArray[0];
-            let currentSlideNumber = (
-                dpTools.nn( currentSlideButton.dataset.slide )
-                ) ?
-                Number( currentSlideButton.dataset.slide ) :
-                1;
+            let currentSlideNumber = activeSlideButton?.dataset.slide || "";
             let arrayPosition = currentSlideNumber - 1;
             let nextSlideNumber = dpTools.getNextInArray(
                     arrayPosition,
@@ -135,29 +72,15 @@ const betogether = {
             betogether.toggleSliderPausePlay( "play", "null" );
         }
     },
-    scrollListener() {
-        let sliderIsInViewOnLoad = betogether.sliderIsInViewport();
-        if ( sliderIsInViewOnLoad === "no" ) {
-            betogether.toggleSliderPausePlay( "pause", "click" );
-        }
-        window.onscroll = function (e) {
-            const sliderMainContainerArray = betogether.getNodeList(
-                "slider container"
-            );
-            const slideContainerArray = betogether.getNodeList(
-                "slide container"
-            );
-            if ( dpTools.ns(
-                sliderMainContainerArray ) &&
-                dpTools.ns( slideContainerArray )
-            ) {
-                let sliderMainContainer = sliderMainContainerArray[0];
+    pause_on_scroll() {
+        window.onscroll = function ( e ) {
+            const sliderMainContainer = betogether.gn( "slider container" );
+            if ( sliderMainContainer ) {
                 if ( sliderMainContainer.classList.contains(
                         "pause_on_scroll"
                     )
                 ) {
                     betogether.toggleSliderPausePlay( "pause", "click" );
-                    betogether.toggleMouseoverListener( "remove" );
                 }
             }
         };
@@ -168,30 +91,28 @@ const betogether = {
         betogether.startThisSlide( slideButton );
     },
     sliderIsInViewport() {
-        const slideContainerArray = betogether.getNodeList( "slide container" );
-        let result = "";
-        if ( dpTools.ns( slideContainerArray ) ) {
-            let slideContainer = slideContainerArray[0];
+        const slideContainer = betogether.gn( "slide container" );
+        let result = "yes";
+        if ( slideContainer ) {
             let pauseHeight = 0.5 *
-                ( dpTools.getElementHeight(slideContainer ) );
+                ( dpTools.getElementHeight( slideContainer ) );
             let elementIsInViewport = dpTools.elementIsInViewport(
                 slideContainer,
-                pauseHeight
+                pauseHeight.toFixed(2)
             );
             result = ( elementIsInViewport === "yes" ) ? "yes" : "no";
         }
         return result;
     },
     startSlideTimer() {
-        const activeSlideArray = betogether.getNodeList( "active slide" );
-        if ( dpTools.ns( activeSlideArray ) ) {
+        const activeSlide = betogether.gn( "active slide" );
+        if ( activeSlide ) {
             betogether.togglePauseButtonAndRecordPauseType(
                 "off",
                 betogether.getLastPauseType()
             );
-            const currentSlide = activeSlideArray[0];
-            const totalDuration = Number( currentSlide.dataset.duration );
-            const startPosition = resumeOrPlayFromStart( currentSlide.id );
+            const totalDuration = Number( activeSlide?.dataset.duration || "" );
+            const startPosition = resumeOrPlayFromStart( activeSlide.id );
             const startTimestamp = getStartTime( startPosition );
             updateProgressBarLength(
                 getProgressBarStartTime( startPosition ),
@@ -218,96 +139,67 @@ const betogether = {
                 0 :
                 getProgressBarElapsedTime();
         }
-        function resumeOrPlayFromStart( currentSlideButtonID ) {
-            const progressBarArray = betogether.getNodeList( "progress bar" );
-            let result = "play-from-start";
-            if ( dpTools.ns( progressBarArray ) ) {
-                let progressbar = progressBarArray[0];
-                if ( dpTools.nn( progressbar.dataset.last_slide_button_id ) ) {
-                    result = (
-                        progressbar.dataset.last_slide_button_id ===
-                        currentSlideButtonID
-                    ) ?
-                    "resume" :
-                    result;
-                }
-                progressbar.dataset.last_slide_button_id = currentSlideButtonID;
-            }
-            return result;
+        function resumeOrPlayFromStart( currentID ) {
+            const progressBar = betogether.gn( "progress bar" );
+            let lastID = progressBar?.dataset.last_slide_button_id || "";
+            progressBar.dataset.last_slide_button_id = currentID;
+            return ( lastID === currentID ) ? "resume" : "play-from-start";
         }
         function getProgressBarElapsedTime() {
-            const progressBarArray = betogether.getNodeList( "progress bar" );
-            if ( dpTools.ns( progressBarArray ) ) {
-                let progressbar = progressBarArray[0];
-                return ( dpTools.nn( progressbar.dataset.elapsed_time ) ) ?
-                    Number( progressbar.dataset.elapsed_time ) :
-                    0;
-            }
+            const progressBar = betogether.gn( "progress bar" );
+            return Number( progressBar?.dataset.elapsed_time || 0 );
         }
         function updateProgressBarLength( elapsedTime, totalDuration ) {
-            const progressBarArray = betogether.getNodeList( "progress bar" );
-            if ( dpTools.ns( progressBarArray ) ) {
-                let progressbar = progressBarArray[0];
+            const progressBar = betogether.gn( "progress bar" );
+            if ( progressBar ) {
                 let rateDone = elapsedTime / totalDuration;
                 let percentDone = dpTools.convertRateToPercent( rateDone );
-                progressbar.style.width = percentDone + "%";
-                progressbar.dataset.elapsed_time = elapsedTime;
+                progressBar.style.width = percentDone + "%";
+                progressBar.dataset.elapsed_time = elapsedTime;
             }
         }
     },
     startSlider() {
         betogether.addListeners();
+        betogether.startSlideTimer();
     },
     startThisSlide( slideButton ) {
-        const slideButtonArray = betogether.getNodeList( "all slide buttons" );
-        const slideArray = betogether.getNodeList( "all slides" );
+        const slideButtonArray = betogether.gnl( "all slide buttons" );
+        const slideArray = betogether.gnl( "all slides" );
         betogether.toggleSliderPausePlay( "pause", "null" );
-        let i;
-        for ( i = 0; i < slideButtonArray.length; i += 1 ) {
-            if ( slideButtonArray[i].id === slideButton.id ) {
-                dpTools.toggleButton( slideButtonArray[i], "on" );
-                dpTools.toggleCSS( slideArray[i], "remove", "off" );
-            } else {
-                dpTools.toggleButton( slideButtonArray[i], "off" );
-                dpTools.toggleCSS( slideArray[i], "add", "off" );
+        if ( dpTools.ns( slideButtonArray ) && dpTools.ns( slideArray ) ) {
+            let i;
+            for ( i = 0; i < slideButtonArray.length; i += 1 ) {
+                if ( slideButtonArray[i].id === slideButton.id ) {
+                    dpTools.toggleButton( slideButtonArray[i], "on" );
+                    dpTools.toggleCSS( slideArray[i], "remove", "off" );
+                } else {
+                    dpTools.toggleButton( slideButtonArray[i], "off" );
+                    dpTools.toggleCSS( slideArray[i], "add", "off" );
+                }
             }
+            betogether.startSlideTimer();
         }
-        betogether.startSlideTimer();
     },
     tabIsInBackgroundListener() {
         document.onvisibilitychange = function( e ) {
-            let lastPauseType = betogether.getLastPauseType();
             if ( betogether.isSliderPlaying() === "yes" ) {
                 betogether.toggleSliderPausePlay( "pause", "click" );
             }
         };
-
-    },
-    toggleMouseoverListener( action ) {
-        const sliderMainContainerArray = betogether.getNodeList(
-            "slider container"
-        );
-        if ( dpTools.ns( sliderMainContainerArray ) ) {
-            let sliderMainContainer = sliderMainContainerArray[0];
-            dpTools.toggleCSS(
-                sliderMainContainer,
-                action,
-                "pause-on-mouseover"
-            );
-        }
     },
     togglePauseButtonAndRecordPauseType( action, pauseType ) {
-        const pauseButtonArray = betogether.getNodeList( "pause button" );
-        if ( dpTools.ns( pauseButtonArray ) ) {
-            let pauseButton = pauseButtonArray[0];
+        const pauseButton = betogether.gn( "pause button" );
+        if ( pauseButton ) {
             dpTools.toggleButton( pauseButton, action );
-            if (
-                pauseType !== "null" &&
-                (
-                    pauseType === "click" ||
-                    dpTools.stringContains( pauseType, "nonclick" ) === "yes"
-                )
-            ) {
+            let pauseTypeNotNull = ( pauseType !== "null" ) ? true : false;
+            let pauseTypeClick = ( pauseType === "click" ) ? true : false;
+            let stringContains = dpTools.stringContains(
+                pauseType,
+                "nonclick"
+            );
+            let pauseTypeNonclick = ( stringContains === "yes" ) ? true : false;
+            if ( pauseTypeNotNull && ( pauseTypeClick || pauseTypeNonclick ) ) {
                 pauseButton.dataset.last_pause_type = pauseType;
             }
         }
@@ -347,7 +239,7 @@ const dpTools = {
         const buttonArray = document.querySelectorAll( arrayString );
         if ( dpTools.ns( buttonArray ) ) {
             buttonArray.forEach( ( element ) => {
-                element.addEventListener("click", function(e) {
+                element.addEventListener("click", function( e ) {
                     object[ eventName ]( e );
                 });
                 element.onkeydown = function( e ) {
@@ -387,6 +279,24 @@ const dpTools = {
             rect.top - rect.bottom :
             rect.bottom - rect.top;
     },
+    getKeystrokeNames( e ) {
+        let k = ( e.key === "ArrowUp" ) ? "up" : "not found";
+        k = ( e.key === "ArrowDown" ) ? "down" : k;
+        k = ( e.key === "ArrowLeft" ) ? "left" : k;
+        k = ( e.key === "ArrowRight" ) ? "right" : k;
+        k = (
+            e.key === " " ||
+            e.key === "Spacebar" ||
+            e.code === "Space"
+        ) ?
+            "spacebar" :
+            k;
+        k = ( e.key === "Enter" ) ? "enter" : k;
+        k = ( e.key === "Home" ) ? "home" : k;
+        k = ( e.key === "End" ) ? "end" : k;
+        k = ( e.key === "Escape" ) ? "escape" : k;
+        return k;
+    },
     getNextInArray( currentPosition, array ) {
         currentPosition = Number( currentPosition );
         return ( currentPosition + 1 < array.length ) ? currentPosition + 1 : 0;
@@ -395,7 +305,7 @@ const dpTools = {
         return ( element !== null ) ? true : false;
     },
     ns( array ) { // Nodelist Set
-        return ( array !== null && array.length > 0 ) ? true : false;
+        return ( array && array.length > 0 ) ? true : false;
     },
     stringContains( haystack, needle ) {
         return ( haystack.indexOf( needle ) !== -1 ) ? "yes" : "no";
@@ -420,24 +330,6 @@ const dpTools = {
         } else if (action === "toggle" ) {
           element.classList.toggle( css );
         }
-    },
-    getKeystrokeNames( e ) {
-        let k = ( e.key === "ArrowUp" ) ? "up" : "not found";
-        k = ( e.key === "ArrowDown" ) ? "down" : k;
-        k = ( e.key === "ArrowLeft" ) ? "left" : k;
-        k = ( e.key === "ArrowRight" ) ? "right" : k;
-        k = (
-            e.key === " " ||
-            e.key === "Spacebar" ||
-            e.code === "Space"
-        ) ?
-            "spacebar" :
-            k;
-        k = ( e.key === "Enter" ) ? "enter" : k;
-        k = ( e.key === "Home" ) ? "home" : k;
-        k = ( e.key === "End" ) ? "end" : k;
-        k = ( e.key === "Escape" ) ? "escape" : k;
-        return k;
     }
 };
 

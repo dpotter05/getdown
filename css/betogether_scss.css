@@ -1,6 +1,4 @@
 #betogether-container {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -25,7 +23,7 @@
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 2;
 }
 
 .betogether-slide {
@@ -75,14 +73,15 @@
 #betogether-progress-bar-container {
   background-color: #999;
   height: 6px;
+  margin-top: 2px;
   position: relative;
   width: 100%;
 }
 
 #betogether-progress-bar {
   background-color: black;
-  top: calc(50% - 1px);
-  height: 2px;
+  top: 0;
+  height: 6px;
   left: 0;
   position: absolute;
   transform-origin: 0 0;
@@ -125,7 +124,7 @@
 #betogether-pause-button {
   display: block;
   background-color: #111;
-  border-radius: 6px;
+  border-radius: 7.2px;
   height: 40px;
   margin-right: 0;
   position: relative;
@@ -174,4 +173,83 @@
     font-size: 0.9rem;
     letter-spacing: 0.05rem;
   }
+}
+#betogether-polaroid-container {
+  display: none;
+}
+
+#betogether-container.polaroid_style {
+  background-color: white;
+  height: calc(var(--polaroid-style-width) * 1.2219959267);
+  justify-content: center;
+  position: relative;
+  width: var(--polaroid-style-width);
+  overflow: visible;
+  margin: 40px auto 131px auto;
+}
+#betogether-container.polaroid_style #betogether-slide-container {
+  position: absolute;
+  top: 0.1%;
+  width: 100%;
+}
+#betogether-container.polaroid_style .betogether-slide {
+  height: calc(0.75 * var(--polaroid-style-width) * 1.2219959267);
+  left: calc(0.065 * var(--polaroid-style-width));
+  position: absolute;
+  top: calc(0.05 * var(--polaroid-style-width) * 1.2219959267);
+  width: calc(0.87 * var(--polaroid-style-width));
+}
+#betogether-container.polaroid_style .betogether-slide::before {
+  background-image: url("../img/polaroid.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.05) rgba(0, 0, 0, 0.05) rgba(0, 0, 0, 0.05) rgba(255, 255, 255, 0.05);
+  content: "";
+  height: 132.5%;
+  left: -7%;
+  position: absolute;
+  top: -6.5%;
+  width: 114%;
+  z-index: 1;
+}
+#betogether-container.polaroid_style .betogether-slide img {
+  height: auto;
+  object-fit: cover;
+  object-position: center top;
+  width: 100%;
+}
+#betogether-container.polaroid_style .betogether-slide p {
+  background-image: none;
+  bottom: -17%;
+  color: black;
+  font-size: 0.9rem;
+  z-index: 1;
+}
+#betogether-container.polaroid_style #betogether-polaroid-container {
+  height: 100%;
+  display: block;
+  margin: 0 !important;
+  object-fit: cover;
+  object-position: 0 0;
+  padding: 0 !important;
+  position: relative;
+  width: 100%;
+  z-index: -1;
+}
+#betogether-container.polaroid_style #betogether-polaroid-container img {
+  height: auto;
+  opacity: 0;
+  width: 100%;
+}
+#betogether-container.polaroid_style #betogether-progress-bar-container {
+  bottom: -8px;
+  position: absolute;
+  left: 30%;
+  width: 40%;
+}
+#betogether-container.polaroid_style #betogether-controls-container {
+  bottom: -91px;
+  position: absolute;
 }
