@@ -1,8 +1,14 @@
 #betogether-container {
+  --bt-button-size: 40px;
+  --bt-button-border-width: 4px;
+  --bt-button-margin-x: 20px;
+  --bt-button-margin-y: 20px;
+  --bt-controls-container-height: calc(var(--bt-button-size) + 2 * var(--bt-button-margin-y));
+  --bt-margin-bottom: calc(40px - 7px);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin: 40px auto;
+  margin: 40px auto var(--bt-margin-bottom) auto;
   overflow: hidden;
 }
 
@@ -79,7 +85,7 @@
 }
 
 #betogether-progress-bar {
-  background-color: black;
+  background-color: #111;
   top: 0;
   height: 6px;
   left: 0;
@@ -92,7 +98,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80px;
+  height: var(--bt-controls-container-height);
   width: 100%;
 }
 
@@ -100,10 +106,10 @@
   background-color: #111;
   border-radius: 50%;
   display: block;
-  height: 40px;
-  margin-right: 20px;
+  height: var(--bt-button-size);
+  margin-right: var(--bt-button-margin-x);
   position: relative;
-  width: 40px;
+  width: var(--bt-button-size);
 }
 
 .betogether-slide-button::before {
@@ -124,11 +130,11 @@
 #betogether-pause-button {
   display: block;
   background-color: #111;
-  border-radius: 7.2px;
-  height: 40px;
+  border-radius: calc(0.18 * var(--bt-button-size));
+  height: var(--bt-button-size);
   margin-right: 0;
   position: relative;
-  width: 40px;
+  width: var(--bt-button-size);
 }
 
 #betogether-pause-button::before,
@@ -136,26 +142,26 @@
   content: "";
   position: absolute;
   background-color: #fff;
-  border-radius: 4px;
-  height: calc(100% - 8px);
-  top: 4px;
-  width: calc(50% - 6px);
+  border-radius: calc(0.1 * var(--bt-button-size));
+  height: calc(100% - 2 * var(--bt-button-border-width));
+  top: var(--bt-button-border-width);
+  width: calc(50% - 1.5 * var(--bt-button-border-width));
 }
 
 #betogether-pause-button::before {
-  left: 4px;
+  left: var(--bt-button-border-width);
 }
 
 #betogether-pause-button::after {
-  right: 4px;
+  right: var(--bt-button-border-width);
 }
 
 #betogether-pause-button svg {
   display: none;
   height: calc(100% - 8px);
-  left: calc(-6% + 4px);
+  left: calc(-6% + var(--bt-button-border-width));
   position: absolute;
-  top: 4px;
+  top: var(--bt-button-border-width);
   width: calc(100% - 8px);
 }
 
@@ -169,6 +175,13 @@
 }
 
 @media only screen and (max-width: 768px) {
+  #betogether-container {
+    --bt-button-size: 30px;
+    --bt-button-border-width: 3px;
+    --bt-button-margin-x: 14px;
+    --bt-button-margin-y: 14px;
+  }
+
   .betogether-slide p {
     font-size: 0.9rem;
     letter-spacing: 0.05rem;
@@ -179,13 +192,14 @@
 }
 
 #betogether-container.polaroid_style {
+  --bt-margin-bottom-polaroid: calc(var(--bt-margin-bottom) + 0px + var(--bt-controls-container-height) + 6px + 2px);
   background-color: white;
   height: calc(var(--polaroid-style-width) * 1.2219959267);
   justify-content: center;
   position: relative;
   width: var(--polaroid-style-width);
   overflow: visible;
-  margin: 40px auto 131px auto;
+  margin-bottom: var(--bt-margin-bottom-polaroid);
 }
 #betogether-container.polaroid_style #betogether-slide-container {
   position: absolute;
@@ -223,7 +237,7 @@
 #betogether-container.polaroid_style .betogether-slide p {
   background-image: none;
   bottom: -17%;
-  color: black;
+  color: #111;
   font-size: 0.9rem;
   z-index: 1;
 }
@@ -250,6 +264,6 @@
   width: 40%;
 }
 #betogether-container.polaroid_style #betogether-controls-container {
-  bottom: -91px;
+  bottom: calc(-1 * (var(--bt-controls-container-height) + 6px + 2px));
   position: absolute;
 }
