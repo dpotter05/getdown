@@ -2,9 +2,9 @@
 
 #### A lightweight WordPress slider plugin with an option to turn your slides into polaroid pictures.
 
-[Demo](https://davidpottercodes.com/getdown)
+[Demo 1](https://davidpottercodes.com/getdown)
 
-[Demo](https://davidpottercodes.com/getdown/polaroid-style/) with `polaroid_style` enabled
+[Demo 2](https://davidpottercodes.com/getdown/polaroid-style/) with `polaroid_style` enabled
 
 **Shortcode Example:**
 
