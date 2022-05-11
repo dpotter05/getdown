@@ -2,6 +2,10 @@
 
 #### A lightweight WordPress slider plugin with an option to turn your slides into polaroid pictures.
 
+**Installation:**
+
+Download the zip file from here (Code > Download Zip), rename it `getdown.zip`, then install it via your WordPress plugin page by clicking "Upload Plugin".
+
 [Demo 1](https://davidpottercodes.com/getdown)
 
 [Demo 2](https://davidpottercodes.com/getdown/polaroid-style/) with `polaroid_style` enabled

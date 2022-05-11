@@ -1,3 +1,1 @@
-Shortcode example:
-
-[getdown image_urls="https://example.com/slide1.jpg, https://examplesite.com/slide2.jpg, https://examplesite.com/slide3.jpg, https://examplesite.com/slide4.jpg" durations_in_milliseconds="4000, 4000, 4000, 4000" image_descriptions="Man dancing, DJ performing, Crowd dancing to music, Crowd celebrating" messages="DO A LITTLE DANCE, MAKE A LITTLE LOVE, GET DOWN TONIGHT, GET DOWN TONIGHT" pause_on_scroll="yes" pause_when_viewing_another_tab="yes" polaroid_style="yes" polaroid-style-width="clamp(360px, 50vw, 500px)"]
+Please see https://github.com/dpotter05/getdown for instructions, examples, and demos.
