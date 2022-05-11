@@ -1,6 +1,6 @@
 # Get Down Polaroid Slider
 
-#### A lightweight WordPress slider plugin with an option to turn your slides into polaroid pictures.
+#### A lightweight WordPress slider plugin with an option to turn your slides into polaroid pictures.[^note]
 
 **Installation:**
 
