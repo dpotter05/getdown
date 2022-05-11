@@ -1,10 +1,10 @@
 # Get Down Polaroid Slider
 
-### A lightweight WordPress slider plugin with an option to turn your slides into polaroid pictures.
+#### A lightweight WordPress slider plugin with an option to turn your slides into polaroid pictures.
 
-[url=https://davidpottercodes.com/getdown](Demo)
+[Demo](https://davidpottercodes.com/getdown)
 
-[url=https://davidpottercodes.com/getdown/polaroid-style/](Demo) with `polaroid_style` enabled
+[Demo](https://davidpottercodes.com/getdown/polaroid-style/) with `polaroid_style` enabled
 
 **Shortcode Example:**
 
@@ -15,6 +15,7 @@
 #### Shortcode Options:
 
 **image_descriptions:**
+
 Add for each slide an image alt description for users unable to view them. Example:
 
 ```
@@ -22,6 +23,7 @@ image_descriptions="Man dancing, DJ performing, Crowd dancing to music, Crowd ce
 ```
 
 **messages:**
+
 Include a short message for each slide. Omit a slide’s message by changing it to a dash. This example omits the third message:
 
 ```
@@ -29,6 +31,7 @@ messages="DO A LITTLE DANCE, MAKE A LITTLE LOVE, -, GET DOWN TONIGHT"
 ```
 
 **pause_on_scroll:**
+
 Set this to yes in order for the slider to automatically pause when the user scrolls. Example:
 
 ```
@@ -36,6 +39,7 @@ pause_on_scroll="yes"
 ```
 
 **pause_when_viewing_another_tab:**
+
 Set this to yes in order for the slider to automatically pause when the user switches away to a different window. Example:
 
 ```
@@ -43,6 +47,7 @@ pause_when_viewing_another_tab="yes"
 ```
 
 **polaroid_style:**
+
 Set this to yes in order for each slide to appear as a polaroid photo. Example:
 
 ```
@@ -50,6 +55,7 @@ polaroid_style="yes"
 ```
 
 **polaroid-style-width:**
+
 Specify a width for your slider when it is in polaroid style. Accepts values in px or vw, not %. Will also accept min(), max(), or clamp(). Examples:
 
 ```
