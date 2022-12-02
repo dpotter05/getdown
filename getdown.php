@@ -28,7 +28,6 @@ if ( !function_exists( 'getdown_shortcode' ) ) {
                 'image_descriptions' => '',
                 'messages' => '',
                 'durations_in_milliseconds' => '',
-                'pause_on_mouseover' => '',
                 'pause_when_viewing_another_tab' => '',
                 'pause_on_scroll' => '',
                 'polaroid_style' => '',
@@ -45,7 +44,6 @@ if ( !function_exists( 'getdown_shortcode' ) ) {
 if ( !function_exists( 'getdown_get_html' ) ) {
     function getdown_get_html( $atts ) {
         $arrays = getdown_convert_input_strings_to_arrays( $atts );
-        //$slider_container_css = ( $arrays['pause_on_mouseover'][0] === 'yes' ) ? 'pause-on-mouseover' : '';
         $slider_container_css = ( $arrays['pause_when_viewing_another_tab'][0] === 'yes' ) ? 'pause_when_viewing_another_tab' : '';
         $slider_container_css .= ( $arrays['pause_on_scroll'][0] === 'yes' ) ? ' pause_on_scroll' : '';
         $slider_container_css .= ( getdown_polaroid_is_on( $arrays ) ) ? ' polaroid_style' : '';
