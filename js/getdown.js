@@ -23,7 +23,7 @@ const getdown = {
             "active slide button" :
                 ".getdown-slide-button[aria-pressed='true']",
             "pause button" : "#getdown-pause-button",
-            "progress bar" : "#getdown-progress-bar",
+            "progress bar" : "#getdown-progressbar",
             "slide container" : "#getdown-slide-container",
             "slider container" : "#getdown-container"
         };

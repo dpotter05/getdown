@@ -1,17 +1,23 @@
 <?php
+
 /**
  * Plugin Name: Get Down Polaroid Slider
  * Author: David Potter
  * Author URI: https://github.com/dpotter05/getdown
  * Text Domain: getdown
  * Description: A lightweight slider with an option to turn your slides into polaroid pictures.
- * Version: 1.0
+ * Version: 1.1
  * License: GPL2
  */
 
 namespace getdown;
 
-defined( 'ABSPATH' ) or die( "You can't access this file directly." );
+defined( 'ABSPATH' ) or die( "Access unavailable" );
+
+require_once 'includes/class-tools.php';
+require_once 'includes/class-slider-template.php';
+require_once 'includes/class-slide-template.php';
+require_once 'includes/class-control-button-template.php';
 
 add_action( 'init', '\getdown\enqueue_scripts' );
 function enqueue_scripts() {
@@ -37,216 +43,113 @@ function shortcode( $atts ) {
         $atts, 
         'getdown'
     );
-    $result = get_html( $atts );
-    return $result;
+    $slider = new Slider( $atts );
+    return $slider->html();
 }
 
-function get_html( $atts ) {
-    $arrays = convert_input_strings_to_arrays( $atts );
-    $slider_container_css = ( $arrays['pause_when_viewing_another_tab'][0] === 'yes' ) ? 'pause_when_viewing_another_tab' : '';
-    $slider_container_css .= ( $arrays['pause_on_scroll'][0] === 'yes' ) ? ' pause_on_scroll' : '';
-    $slider_container_css .= ( polaroid_is_on( $arrays ) ) ? ' polaroid_style' : '';
-    $polaroid_style_width = (
-        polaroid_is_on( $arrays ) &&
-        !empty($arrays['polaroid-style-width'][0])
-    ) ? '--polaroid-style-width: ' . $arrays['polaroid-style-width'][0] . ';' : '';
-    $slide_container = add_container( [
-        'id'        => 'getdown-slide-container',
-        'cssClass'  => '',
-        'content'   => get_slides( $arrays ),
-        'indent'    => 2,
-        'element'   => 'div',
-        'style'     => '',
-    ] );
-    $progress_bar_container = add_container( [
-        'id'        => 'getdown-progress-bar-container',
-        'cssClass'  => '',
-        'content'   => get_progress_bar(),
-        'indent'    => 2,
-        'element'   => 'div',
-        'style'     => '',
-    ] );
-    $controls_container = add_container( [
-        'id'        => 'getdown-controls-container',
-        'content'   => get_controls( $arrays ),
-        'cssClass'  => '',
-        'indent'    => 2,
-        'element'   => 'div',
-        'style'     => '',
-    ] );
-    $slider = add_container( [
-        'id'        => 'getdown-container',
-        'content'   => $slide_container . $progress_bar_container . $controls_container,
-        'cssClass'  => $slider_container_css,
-        'indent'    => 1,
-        'element'   => 'aside',
-        'style'     => $polaroid_style_width,
-    ] );
-    return $slider;
+class Slider {
+    function __construct( $atts ) {
+        $this->config_arrays = tools\Tools::convert_input_strings_to_arrays( $atts );
+        $this->set_css();
+        $this->set_content();
+    }
+    public function set_css() {
+        $pause_on_tab = 'pause_when_viewing_another_tab';
+        $this->cssClass = ( $this->config_arrays[ $pause_on_tab ][0] === 'yes' ) ? $pause_on_tab : '';
+        $this->cssClass .= ( $this->config_arrays['pause_on_scroll'][0] === 'yes' ) ? ' pause_on_scroll' : '';
+        $this->cssClass .= ( Polaroid_style::on( $this->config_arrays ) ) ? ' polaroid_style' : '';
+        $this->polaroid_width = Polaroid_style::set_width( $this->config_arrays );
+    }
+    public function set_content() {
+        $slide_content = new Slide_content( $this->config_arrays );
+        $this->slide = $slide_content->html();
+        $control_content = new Control_content( $this->config_arrays );
+        $this->controls = $control_content->html();
+    }
+    public function html() {
+        $template = new slider\Slider_template( [
+            'slide'     => $this->slide,
+            'controls'  => $this->controls,
+            'cssClass'  => $this->cssClass,
+            'style'     => $this->polaroid_width,
+        ] );
+        return $template->html();
+    }
 }
 
-function convert_input_strings_to_arrays( $atts ) {
-    if ( !empty( $atts ) && is_array( $atts ) ) {
-        foreach ( $atts as $key => $value ) {
-            $args[$key] = get_array_from_string( [ 'string' => $atts[$key] ] );
-            if ( $key == 'polaroid-style-width') {
-                $args[$key] = [ sanitize_text_field( $atts[$key] ) ];
+class Polaroid_style {
+    public static function on( $args ) {
+        return ( !empty( $args['polaroid_style'] ) && $args['polaroid_style'][0] == 'yes' ) ? true : false;
+    }
+    public static function set_width( $config_arrays ) {
+        $result = '';
+        if ( self::on( $config_arrays ) && is_array( $config_arrays['polaroid-style-width'] ) ) {
+            $polaroid_array = $config_arrays['polaroid-style-width'];
+            $polaroid_width = ( count( $polaroid_array ) === 1 ) ? $polaroid_array[0] : implode( ',', $polaroid_array );
+            $result = '--polaroid-style-width: ' . $polaroid_width . ';';
+            return $result;
+        }
+    }
+}
+
+class Slide_content {
+    function __construct( $config_arrays ) {
+        $this->config_arrays = $config_arrays;
+        $this->values = tools\Tools::emptyCheckArrayWithDefaults( $config_arrays, [
+            'image_urls'                => '',
+            'image_descriptions'        => array(),
+            'messages'                  => array(),
+            'durations_in_milliseconds' => array()
+        ] );
+    }
+    public function attr( $attr ) {
+        $result = [];
+        foreach ( $attr as $key => $value ) {
+            $result += [ $key => $value ];
+        }
+        return $result;
+    }
+    public function slide_html( $attr ) {
+        $slide = new slide\Slide_template( $this->attr( $attr ) );
+        return $slide->html();
+    }
+    public function html() {
+        $values = $this->values;
+        $result = '';
+        if ( tools\Tools::array_has_values( $values['image_urls'] ) ) {
+            for ( $i = 0; $i < count( $values['image_urls'] ); $i++ ) {
+                $result .= $this->slide_html( [
+                    'alt'       => tools\Tools::emptyCheck( $values['image_descriptions'][$i], '' ),
+                    'message'   => tools\Tools::emptyCheck( $values['messages'][$i], '' ),
+                    'duration'  => tools\Tools::emptyCheck( $values['durations_in_milliseconds'][$i], '' ),
+                    'image_url' => tools\Tools::clean_url( $values['image_urls'][$i] ),
+                    'count'     => $i,
+                ] );
             }
         }
+        return $result;
     }
-    return $args;
 }
 
-function get_array_from_string( $args ) {
-    $result = '';
-    $string = ( !empty( $args['string'] ) && is_string( $args['string'] ) ) ? sanitize_text_field( $args['string'] ) : '';
-    if ( is_string( $string ) ) {
-        if ( strpos( $string, ',' ) !== false ) {
-            $result = explode( ',', $string );
-        } else {
-            $result = array( $string );
-        }
+class Control_content {
+    function __construct( $config_arrays ) {
+        $this->image_urls = $config_arrays['image_urls'];
     }
-    return $result;
-}
-
-
-function get_slides( $args ) {
-    $result = '
-';
-    $image_urls = ( !empty( $args['image_urls'] ) ) ? $args['image_urls'] : '';
-    $image_descriptions = ( !empty( $args['image_descriptions'] ) ) ? $args['image_descriptions'] : array();
-    $messages = ( !empty( $args['messages'] ) ) ? $args['messages'] : array();
-    $durations_in_milliseconds = ( !empty( $args['durations_in_milliseconds'] ) ) ? $args['durations_in_milliseconds'] : array();
-    $polaroid_style = ( polaroid_is_on( $args ) ) ?
-        get_polaroid_container() :
-        '';
-    if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
-        for ( $i = 0; $i < count( $image_urls ); $i++ ) {
-            $alt = ( !empty( $image_descriptions[$i] ) ) ? $image_descriptions[$i] : '';
-            $message = ( !empty( $messages[$i] ) ) ? $messages[$i] : '';
-            $result .= get_slide( 
-                [
-                    'image_url' => $image_urls[$i], 
-                    'count'     => $i,
-                    'alt'       => $alt,
-                    'message'   => $message,
-                    'duration'  => $durations_in_milliseconds[$i],
+    public function html() {
+        if ( tools\Tools::array_has_values( $this->image_urls ) ) {
+            $result = '';
+            for ( $i = 0; $i < count( $this->image_urls ); $i++ ) {
+                $first_slide_on = ( $i === 0 ) ? 'true' : 'false';
+                $slide_number = $i + 1;
+                $control_button[$i] = new controls\Control_button_template( [
+                    'slide_number'   => $slide_number,
+                    'first_slide_on' => $first_slide_on
                 ] );
+                $result .= $control_button[$i]->html();
+            }
         }
+        return $result;
     }
-    $result = ( polaroid_is_on( $args ) ) ? $result . $polaroid_style : $result;
-    return $result;
-}
-
-function polaroid_is_on( $args ) {
-    return ( !empty( $args['polaroid_style'] ) && $args['polaroid_style'][0] == "yes" ) ? true : false;
-}
-
-function get_polaroid_container() {
-    return  add_container(
-        [
-            'id'        => 'getdown-polaroid-container',
-            'content'   => '<img src="' . plugins_url() . '/getdown/img/polaroid.png" alt="Polaroid picture frame" />',
-            'cssClass'  => '',
-            'indent'    => 3,
-            'element'   => 'div',
-            'style'     => '',
-        ]
-    );
-}
-
-function get_slide( $args ) {
-    $result = '';
-    $image_url = ( !empty( $args['image_url'] ) && is_string( $args['image_url'] ) ) ? $args['image_url'] : '';
-    if ( !empty( $image_url ) ) {
-        $offCSS = ( $args['count'] === 0 ) ? '' : ' off';
-        $count = ( is_numeric( $args['count'] ) ) ? $args['count'] + 1 : '';
-        $image_url = trim( esc_url( $image_url ) );
-        $alt = ( !empty($args['alt'] ) ) ? trim( sanitize_text_field( $args['alt'] ) ) : '';
-        $message = ( !empty($args['message'] ) ) ? trim( sanitize_text_field( $args['message'] ) ) : '';
-        $message = ( $message == '-' || $message == '' ) ? '' : '<p>' . $message . '</p>';
-        $duration = ( !empty( $args['duration'] ) ) ? trim( $args['duration'] ) : '4000';
-        $result .= <<<HERE
-            <div id="getdown-slide-{$count}" class="getdown-slide{$offCSS}" data-duration="{$duration}">
-                <img src="{$image_url}" alt="{$alt}" />
-                {$message}
-            </div>
-
-HERE;
-    }
-    return $result;
-}
-
-function get_progress_bar() {
-    return <<<HERE
-
-            <div id="getdown-progress-bar"></div>
-
-HERE;
-}
-
-
-function get_controls( $args ) {
-    $result = '
-';
-    $image_urls = ( !empty( $args['image_urls'] ) ) ? $args['image_urls'] : array();
-    if (!empty( $image_urls ) && is_array( $image_urls ) && count( $image_urls ) > 0 ) {
-        for ( $i = 0; $i < count( $image_urls ); $i++ ) {
-            $count = $i + 1;
-            $id = 'getdown-control-' . ( $i + 1 );
-            $css_class = 'getdown-slide-button';
-            $aria_pressed = ( $count === 1 ) ? 'true' : 'false';
-            $data_slide = $count;
-            $result .= <<<HERE
-            <a href="#" id="{$id}" class="{$css_class}" data-slide="{$data_slide}" role="button" aria-pressed="{$aria_pressed}"></a>
-
-HERE;
-        }
-    }
-    $result .= get_pause_button();
-    return $result;
-}
-
-function get_pause_button() {
-    return <<<HERE
-            <a href="#" id="getdown-pause-button" role="button" aria-pressed="false" data-last_pause_type="nonclick onload">
-                <svg style="stroke:white; fill:white; stroke-opacity:1;stroke-linejoin:round;stroke-width:3.4;stroke-miterlimit:4;stroke-dasharray:none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" version="1.1" viewBox="6.3 3.3 14.4 17.4"><path d="M8 5v14l11-7z"></path></svg>
-            </a>
-
-HERE;
-}
-
-function add_container( $args ) {
-    $result = '';
-    $id = ( !empty( $args['id'] ) ) ? $args['id'] : '';
-    $cssClass = ( !empty( $args['cssClass'] ) ) ? ' class="' . $args['cssClass'] . '"' : '';
-    $content = ( !empty( $args['content'] ) ) ? rtrim( $args['content'] ) : '';
-    $indent = ( !empty( $args['indent'] ) && is_numeric( $args['indent'] ) ) ? $args['indent'] : '';
-    $element = ( !empty( $args['element'] ) && is_string( $args['element'] ) ) ? $args['element'] : '';
-    $style = ( !empty( $args['style'] ) && is_string( $args['style'] ) ) ? ' style="' . $args['style'] . '"' : '';
-    $tab = get_tab_indentation( $indent );
-    if ( !empty( $content ) ) {
-        $result .= <<<HERE
-
-{$tab}<{$element} id="{$id}"{$cssClass}{$style}>{$content}
-{$tab}</{$element}>
-HERE;
-    }
-    return $result;
-}
-
-function get_tab_indentation( $tabNumber ) {
-    $result = '';
-    $tab = <<<HERE
-
-HERE;
-    if ( !empty( $tabNumber ) && is_numeric( $tabNumber )) {
-        for ( $i = 0; $i < $tabNumber; $i++ ) {
-            $result .= $tab;
-        }
-    }
-    return $result;
 }
 
 ?>

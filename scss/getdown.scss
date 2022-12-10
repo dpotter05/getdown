@@ -1,9 +1,9 @@
 $gd-margin-top: 40px;
 $gd-margin-bottom: 40px;
-$gd-progress-bar-color: #111;
-$gd-progress-bar-color-background: #999;
-$gd-progress-bar-height: 6px;
-$gd-progress-bar-top-margin: 2px;
+$gd-progressbar-color: #111;
+$gd-progressbar-color-background: #999;
+$gd-progressbar-height: 6px;
+$gd-progressbar-top-margin: 2px;
 $gd-button-border-color: #111;
 $gd-button-border-width: 4px;
 $gd-button-border-width-mobile: 3px;
@@ -109,17 +109,17 @@ $gd-polaroid-background-color: white;
     bottom: 10px;
     width: 80%;
 }
-#getdown-progress-bar-container {
-    background-color: $gd-progress-bar-color-background;
-    height: $gd-progress-bar-height;
-    margin-top: $gd-progress-bar-top-margin;
+#getdown-progressbar-container {
+    background-color: $gd-progressbar-color-background;
+    height: $gd-progressbar-height;
+    margin-top: $gd-progressbar-top-margin;
     position: relative;
     width: 100%;
 }
-#getdown-progress-bar {
-    background-color: $gd-progress-bar-color;
+#getdown-progressbar {
+    background-color: $gd-progressbar-color;
     top: 0;
-    height: $gd-progress-bar-height;
+    height: $gd-progressbar-height;
     left: 0;
     position: absolute;
     transform-origin: 0 0;
@@ -175,7 +175,7 @@ $gd-polaroid-background-color: white;
 #getdown-pause-button::after {
     right: var(--gd-button-border-width);
 }
-#getdown-pause-button svg {
+#getdown-pause-button img {
     display: none;
     height: $gd-pause-button-size;
     left: calc(-6% + var(--gd-button-border-width));
@@ -183,7 +183,7 @@ $gd-polaroid-background-color: white;
     top: var(--gd-button-border-width);
     width: $gd-pause-button-size;
 }
-#getdown-pause-button[aria-pressed="true"] svg {
+#getdown-pause-button[aria-pressed="true"] img {
     display: block;
 }
 #getdown-pause-button[aria-pressed="true"]::before,
@@ -206,7 +206,7 @@ $gd-polaroid-background-color: white;
     display: none;
 }
 #getdown-container.polaroid_style {
-    --gd-margin-bottom-polaroid: calc(var(--gd-margin-bottom) + 0px + var(--gd-controls-container-height) + #{$gd-progress-bar-height} + #{$gd-progress-bar-top-margin});
+    --gd-margin-bottom-polaroid: calc(var(--gd-margin-bottom) + 0px + var(--gd-controls-container-height) + #{$gd-progressbar-height} + #{$gd-progressbar-top-margin});
     background-color: $gd-polaroid-background-color;
     height: $gd-polaroid-height;
     justify-content: center;
@@ -270,14 +270,14 @@ $gd-polaroid-background-color: white;
         opacity: 0;
         width: 100%;
     }
-    #getdown-progress-bar-container {
+    #getdown-progressbar-container {
         bottom: -8px;
         position: absolute;
         left: 30%;
         width: 40%;
     }
     #getdown-controls-container {
-        bottom: calc(-1 * (var(--gd-controls-container-height) + #{$gd-progress-bar-height} + #{$gd-progress-bar-top-margin}));
+        bottom: calc(-1 * (var(--gd-controls-container-height) + #{$gd-progressbar-height} + #{$gd-progressbar-top-margin}));
         position: absolute;
     }
 }
