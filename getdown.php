@@ -14,10 +14,8 @@ namespace getdown;
 
 defined( 'ABSPATH' ) or die( "Access unavailable" );
 
-require_once 'includes/class-tools.php';
-require_once 'includes/class-slider-template.php';
-require_once 'includes/class-slide-template.php';
-require_once 'includes/class-control-button-template.php';
+include_once 'includes/class-autoload.php';
+new autoload\Autoload();
 
 add_action( 'init', '\getdown\enqueue_scripts' );
 function enqueue_scripts() {
