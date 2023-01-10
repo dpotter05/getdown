@@ -3,18 +3,15 @@ const dpTools = {
         const buttonArray = document.querySelectorAll( arrayString );
         if ( dpTools.ns( buttonArray ) ) {
             buttonArray.forEach( ( element ) => {
-                element.addEventListener("click", function( e ) {
+                element.onclick = function( e ) {
                     object[ eventName ]( e );
-                });
-                element.onkeydown = function( e ) {
-                    keystroke = dpTools.getKeystrokeNames( e );
-                    if ( keystroke == "enter" || keystroke == "spacebar" ) {
-                        e.preventDefault();
-                        object[ eventName ]( e );
-                    }
                 };
-            });
+            } );
         }
+    },
+    buttonIsOn( button ) {
+        let status = button.getAttribute( "aria-pressed" );
+        return ( status === "true" ) ? true : false;
     },
     convertRateToPercent( number ) {
         let percent = number * 100;
@@ -22,77 +19,32 @@ const dpTools = {
     },
     elementIsInViewport( el, pixelsShowing ) {
         let rect = el.getBoundingClientRect();
-        let testTop = ( window.innerHeight - rect.top > pixelsShowing ) ?
-            true :
-            false;
+        let math = window.innerHeight - rect.top;
+        let testTop = ( math > pixelsShowing ) ? true : false;
         let testBottom = ( rect.bottom > pixelsShowing ) ? true : false;
         return ( testTop && testBottom ) ? "yes" : "no";
     },
-    getAnchorButtonStatus( button ) {
-        const status = button.getAttribute( "aria-pressed" );
-        return ( status === "true" ) ? "on" : "off";
-    },
-    getButtonStatus( button ) {
-        return ( button.getAttribute( "aria-pressed" ) === "true" ) ?
-        "on" :
-        "off";
-    },
     getElementHeight( element ) {
         let rect = element.getBoundingClientRect();
-        return ( rect.top > rect.bottom ) ?
-            rect.top - rect.bottom :
-            rect.bottom - rect.top;
+        let math1 = rect.top - rect.bottom;
+        let math2 = rect.bottom - rect.top;
+        return ( rect.top > rect.bottom ) ? math1 : math2;
     },
-    getKeystrokeNames( e ) {
-        let k = ( e.key === "ArrowUp" ) ? "up" : "not found";
-        k = ( e.key === "ArrowDown" ) ? "down" : k;
-        k = ( e.key === "ArrowLeft" ) ? "left" : k;
-        k = ( e.key === "ArrowRight" ) ? "right" : k;
-        k = (
-            e.key === " " ||
-            e.key === "Spacebar" ||
-            e.code === "Space"
-        ) ?
-            "spacebar" :
-            k;
-        k = ( e.key === "Enter" ) ? "enter" : k;
-        k = ( e.key === "Home" ) ? "home" : k;
-        k = ( e.key === "End" ) ? "end" : k;
-        k = ( e.key === "Escape" ) ? "escape" : k;
-        return k;
+    getNextInArray( args ) {
+        return ( args.pos + 1 < args.buttons.length ) ? args.pos + 1 : 0;
     },
-    getNextInArray( currentPosition, array ) {
-        currentPosition = Number( currentPosition );
-        return ( currentPosition + 1 < array.length ) ? currentPosition + 1 : 0;
+    nn( content ) { // Not Null
+        return ( content !== null ) ? true : false;
     },
-    nn( element ) { // Not Null
-        return ( element !== null ) ? true : false;
-    },
-    ns( array ) { // Nodelist Set
-        return ( array && array.length > 0 ) ? true : false;
-    },
-    stringContains( haystack, needle ) {
-        return ( haystack.indexOf( needle ) !== -1 ) ? "yes" : "no";
+    ns( nl ) { // Nodelist Set
+        return ( nl && nl.length > 0 ) ? true : false;
     },
     toggleButton( button, action ) {
-        if ( action === "on" || action === "off") {
-            action = ( action === "on" ) ? true : false;
-        } else if ( action === "toggle" ) {
-            action = (
-                button.getAttribute( "aria-pressed" ) === "true"
-            ) ?
-            false :
-            true;
-        }
-        button.setAttribute( "aria-pressed", action );
+        let boolean = ( this.buttonIsOn( button ) ) ? false : true;
+        boolean = ( action === "toggle" ) ? boolean : action;
+        button.setAttribute( "aria-pressed", boolean );
     },
     toggleCSS( element, action, css ) {
-        if ( action === "add" ) {
-            element.classList.add( css );
-        } else if ( action === "remove" ) {
-            element.classList.remove( css );
-        } else if (action === "toggle" ) {
-          element.classList.toggle( css );
-        }
+        element.classList[action]( css );
     }
 };

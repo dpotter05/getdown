@@ -5,23 +5,25 @@ const getdown = {
     addListeners() {
         dpTools.addAnchorButtonListeners(
             "a.getdown-slide-button",
-            getdown, "slideButtonEvent"
+            getdown,
+            "slideButtonEvent"
         );
         dpTools.addAnchorButtonListeners(
             "a#getdown-pause-button",
-            getdown, "pauseButtonEvent"
+            getdown,
+            "pauseButtonEvent"
         );
-        getdown.pause_on_scroll();
-        getdown.tabIsInBackgroundListener();
+        this.pause_on_scroll();
+        this.tabIsInBackgroundListener();
     },
     getLastPauseType() {
-        return getdown.gn( "pause button" )?.dataset.last_pause_type || "";
+        return this.gn( "pause button" ) ?.dataset.last_pause_type || "";
     },
     gn( query ) { // Get Node
+        let tooLong = ".getdown-slide-button[aria-pressed='true']";
         let queryObject = {
             "active slide" : ".getdown-slide:not(.off)",
-            "active slide button" :
-                ".getdown-slide-button[aria-pressed='true']",
+            "active slide button" : tooLong,
             "pause button" : "#getdown-pause-button",
             "progress bar" : "#getdown-progressbar",
             "slide container" : "#getdown-slide-container",
@@ -37,50 +39,45 @@ const getdown = {
         return document.querySelectorAll( queryObject[ query ] );
     },
     isSliderPlaying() {
-        const pauseButton = getdown.gn( "pause button" );
-        return (
-            pauseButton &&
-            dpTools.getButtonStatus( pauseButton ) === "off"
-        ) ? "yes" : "no";
+        const pauseButton = this.gn( "pause button" );
+        const status = dpTools.buttonIsOn( pauseButton );
+        const test1 = dpTools.nn( pauseButton );
+        const test2 = ( status ) ? false : true;
+        return ( test1 && test2 ) ? true : false;
     },
     nextSlide() {
-        const activeSlideButton = getdown.gn( "active slide button" );
-        const slideButtonArray = getdown.gnl( "all slide buttons" );
-        if (
-            activeSlideButton &&
-            dpTools.ns( slideButtonArray )
-        ) {
-            let currentSlideNumber = activeSlideButton?.dataset.slide || "";
-            let arrayPosition = currentSlideNumber - 1;
-            let nextSlideNumber = dpTools.getNextInArray(
-                    arrayPosition,
-                    slideButtonArray
-                ) + 1;
-            slideButtonArray.forEach( ( element ) => {
-                if ( element.id == "getdown-control-" + nextSlideNumber ) {
-                    getdown.startThisSlide( element );
-                }
-            });
+        const activeNum = this.gn( "active slide button" ) ?.dataset.slide;
+        const buttonArray = this.gnl( "all slide buttons" );
+        const test1 = dpTools.nn( activeNum );
+        const test2 = dpTools.ns( buttonArray );
+        if ( test1 && test2 ) {
+            let arrayPos = Number( activeNum ) - 1;
+            let args = { pos: arrayPos, buttons: buttonArray };
+            let nextNum = dpTools.getNextInArray( args ) + 1;
+            buttonArray.forEach( ( element ) => {
+                let id = "getdown-control-" + nextNum;
+                let test = ( element.id === id ) ? true : false;
+                test && this.startThisSlide( element.id );
+            } );
         }
     },
     pauseButtonEvent( e ) {
         e.preventDefault();
         const pauseButton = document.activeElement;
-        if ( dpTools.getAnchorButtonStatus( pauseButton ) === "off" ) {
-            getdown.toggleSliderPausePlay( "pause", "click" );
+        if ( dpTools.buttonIsOn( pauseButton ) ) {
+            this.toggleSliderPausePlay( "play", "null" );
         } else {
-            getdown.toggleSliderPausePlay( "play", "null" );
+            this.toggleSliderPausePlay( "pause", "click" );
         }
     },
     pause_on_scroll() {
         window.onscroll = function ( e ) {
-            const sliderMainContainer = getdown.gn( "slider container" );
-            if ( sliderMainContainer ) {
-                if ( sliderMainContainer.classList.contains(
-                        "pause_on_scroll"
-                    )
-                ) {
-                    getdown.toggleSliderPausePlay( "pause", "click" );
+            const container = getdown.gn( "slider container" );
+            let method1 = "pause_on_scroll";
+            let method2 = "toggleSliderPausePlay";
+            if ( container ) {
+                if ( container.classList.contains( method1 ) ) {
+                    getdown[method2]( "pause", "click" );
                 }
             }
         };
@@ -88,71 +85,55 @@ const getdown = {
     slideButtonEvent( e ) {
         e.preventDefault();
         const slideButton = document.activeElement;
-        getdown.startThisSlide( slideButton );
-    },
-    sliderIsInViewport() {
-        const slideContainer = getdown.gn( "slide container" );
-        let result = "yes";
-        if ( slideContainer ) {
-            let pauseHeight = 0.5 *
-                ( dpTools.getElementHeight( slideContainer ) );
-            let elementIsInViewport = dpTools.elementIsInViewport(
-                slideContainer,
-                pauseHeight.toFixed(2)
-            );
-            result = ( elementIsInViewport === "yes" ) ? "yes" : "no";
-        }
-        return result;
+        this.startThisSlide( slideButton.id );
     },
     startSlideTimer() {
-        const activeSlide = getdown.gn( "active slide" );
+        const activeSlide = this.gn( "active slide" );
         if ( activeSlide ) {
-            getdown.togglePauseButtonAndRecordPauseType(
-                "off",
-                getdown.getLastPauseType()
-            );
-            const totalDuration = Number( activeSlide?.dataset.duration || "" );
-            const startPosition = resumeOrPlayFromStart( activeSlide.id );
-            const startTimestamp = getStartTime( startPosition );
-            updateProgressBarLength(
-                getProgressBarStartTime( startPosition ),
-                totalDuration
-            );
+            const method1 = "togglePauseAndSavePauseType";
+            this[method1]( "off", this.getLastPauseType() );
+            let duration = activeSlide ?.dataset.duration || "";
+            duration = Number( duration );
+            const startPos = getStartPos( activeSlide.id );
+            const startTimestamp = getStartTime( startPos );
+            editProgressBar( progressBarStart( startPos ), duration );
             getdownSlideTimer = setInterval( function() {
                 const nowTimestamp = Date.now();
                 const elapsedTime = nowTimestamp - startTimestamp;
-                updateProgressBarLength( elapsedTime, totalDuration );
-                if ( elapsedTime >= totalDuration ) {
+                editProgressBar( elapsedTime, duration );
+                if ( elapsedTime >= duration ) {
                     getdown.toggleSliderPausePlay( "pause", "null" );
                     getdown.nextSlide();
                 }
             }, 20);
         }
-        function getStartTime( startPosition ) {
+        function getStartTime( startPos ) {
             let nowInMilliseconds = Date.now();
-            return ( startPosition === "play-from-start" ) ?
+            return ( startPos === "play-from-start" ) ?
                 nowInMilliseconds :
                 nowInMilliseconds - getProgressBarElapsedTime();
         }
-        function getProgressBarStartTime( startPosition ) {
-            return ( startPosition === "play-from-start" ) ?
-                0 :
-                getProgressBarElapsedTime();
+        function progressBarStart( startPos ) {
+            const value = "play-from-start";
+            const test = ( startPos === value ) ? true : false;
+            const result = test ? 0 : getProgressBarElapsedTime();
+            return result;
         }
-        function resumeOrPlayFromStart( currentID ) {
+        function getStartPos( currentID ) {
             const progressBar = getdown.gn( "progress bar" );
             let lastID = progressBar?.dataset.last_slide_button_id || "";
             progressBar.dataset.last_slide_button_id = currentID;
-            return ( lastID === currentID ) ? "resume" : "play-from-start";
+            let test = ( lastID === currentID ) ? true : false;
+            return ( test ) ? "resume" : "play-from-start";
         }
         function getProgressBarElapsedTime() {
             const progressBar = getdown.gn( "progress bar" );
             return Number( progressBar?.dataset.elapsed_time || 0 );
         }
-        function updateProgressBarLength( elapsedTime, totalDuration ) {
+        function editProgressBar( elapsedTime, duration ) {
             const progressBar = getdown.gn( "progress bar" );
             if ( progressBar ) {
-                let rateDone = elapsedTime / totalDuration;
+                let rateDone = elapsedTime / duration;
                 let percentDone = dpTools.convertRateToPercent( rateDone );
                 progressBar.style.width = percentDone + "%";
                 progressBar.dataset.elapsed_time = elapsedTime;
@@ -160,76 +141,58 @@ const getdown = {
         }
     },
     startSlider() {
-        getdown.addListeners();
-        getdown.startSlideTimer();
+        this.addListeners();
+        this.startSlideTimer();
     },
-    startThisSlide( slideButton ) {
-        const slideButtonArray = getdown.gnl( "all slide buttons" );
-        const slideArray = getdown.gnl( "all slides" );
-        getdown.toggleSliderPausePlay( "pause", "null" );
-        if ( dpTools.ns( slideButtonArray ) && dpTools.ns( slideArray ) ) {
+    startThisSlide( id ) {
+        const buttonArray = this.gnl( "all slide buttons" );
+        const slideArray = this.gnl( "all slides" );
+        this.toggleSliderPausePlay( "pause", "null" );
+        if ( dpTools.ns( buttonArray ) && dpTools.ns( slideArray ) ) {
             let i;
-            for ( i = 0; i < slideButtonArray.length; i += 1 ) {
-                if ( slideButtonArray[i].id === slideButton.id ) {
-                    dpTools.toggleButton( slideButtonArray[i], "on" );
-                    dpTools.toggleCSS( slideArray[i], "remove", "off" );
-                } else {
-                    dpTools.toggleButton( slideButtonArray[i], "off" );
-                    dpTools.toggleCSS( slideArray[i], "add", "off" );
-                }
+            for ( i = 0; i < buttonArray.length; i += 1 ) {
+                let a = ( buttonArray[i].id === id ) ? "remove" : "add";
+                let b = ( buttonArray[i].id === id ) ? true : false;
+                dpTools.toggleCSS( slideArray[i], a, "off" );
+                dpTools.toggleButton( buttonArray[i], b );
             }
-            getdown.startSlideTimer();
+            this.startSlideTimer();
         }
     },
     tabIsInBackgroundListener() {
         document.onvisibilitychange = function( e ) {
-            if ( getdown.isSliderPlaying() === "yes" ) {
-                getdown.toggleSliderPausePlay( "pause", "click" );
-            }
+            let method = "toggleSliderPausePlay";
+            getdown.isSliderPlaying() && getdown[method]( "pause", "click" );
         };
     },
-    togglePauseButtonAndRecordPauseType( action, pauseType ) {
-        const pauseButton = getdown.gn( "pause button" );
+    togglePauseAndSavePauseType( buttonStatus, pauseType ) {
+        const pauseButton = this.gn( "pause button" );
         if ( pauseButton ) {
-            dpTools.toggleButton( pauseButton, action );
-            let pauseTypeNotNull = ( pauseType !== "null" ) ? true : false;
-            let pauseTypeClick = ( pauseType === "click" ) ? true : false;
-            let stringContains = dpTools.stringContains(
-                pauseType,
-                "nonclick"
-            );
-            let pauseTypeNonclick = ( stringContains === "yes" ) ? true : false;
-            if ( pauseTypeNotNull && ( pauseTypeClick || pauseTypeNonclick ) ) {
+            dpTools.toggleButton( pauseButton, buttonStatus );
+            let test1 = ( pauseType !== "null" ) ? true : false;
+            let test2 = ( pauseType === "click" ) ? true : false;
+            let test3 = ( pauseType.includes( "nonclick" ) ) ? "yes" : "no";
+            let test4 = ( test3 === "yes" ) ? true : false;
+            if ( test1 && ( test2 || test4 ) ) {
                 pauseButton.dataset.last_pause_type = pauseType;
             }
         }
     },
-    toggleSliderPausePlay( action, pauseType ) {
-        let result = "";
-        if ( action === "play" ) {
-            result = "play slider";
-        } else if ( action === "pause" ) {
-            if (
-                pauseType === "click" ||
-                pauseType === "null" ||
-                beginNonclickPause( pauseType ) === "yes"
-            ) {
-                result = "pause slider";
-            }
-        }
+    toggleSliderPausePlay( action, pause ) {
+        const test = {};
+        test.a = ( action === "play" ) ? true : false;
+        test.b1 = ( action === "pause" ) ? true : false;
+        test.b2 = ( pause === "click" ) ? true : false;
+        test.b3 = ( pause === "null" ) ? true : false;
+        test.b = ( test.b1 && ( test.b2 || test.b3 ) )
+            ? true : false;
+        let result = ( test.a ) ? "play slider" : "";
+        ( result === "" && test.b ) && ( result = "pause slider");
         if ( result === "pause slider" ) {
             clearInterval( getdownSlideTimer );
-            getdown.togglePauseButtonAndRecordPauseType( "on", pauseType );
+            this.togglePauseAndSavePauseType( true, pause );
         } else if ( result === "play slider" ) {
-            getdown.startSlideTimer();
-        }
-        function beginNonclickPause( pauseType ) {
-            return (
-                dpTools.stringContains( pauseType, "nonclick" ) === "yes" &&
-                getdown.isSliderPlaying() === "yes"
-            ) ?
-            "yes" :
-            "no" ;
+            this.startSlideTimer();
         }
     }
 };
@@ -239,18 +202,15 @@ const dpTools = {
         const buttonArray = document.querySelectorAll( arrayString );
         if ( dpTools.ns( buttonArray ) ) {
             buttonArray.forEach( ( element ) => {
-                element.addEventListener("click", function( e ) {
+                element.onclick = function( e ) {
                     object[ eventName ]( e );
-                });
-                element.onkeydown = function( e ) {
-                    keystroke = dpTools.getKeystrokeNames( e );
-                    if ( keystroke == "enter" || keystroke == "spacebar" ) {
-                        e.preventDefault();
-                        object[ eventName ]( e );
-                    }
                 };
-            });
+            } );
         }
+    },
+    buttonIsOn( button ) {
+        let status = button.getAttribute( "aria-pressed" );
+        return ( status === "true" ) ? true : false;
     },
     convertRateToPercent( number ) {
         let percent = number * 100;
@@ -258,78 +218,33 @@ const dpTools = {
     },
     elementIsInViewport( el, pixelsShowing ) {
         let rect = el.getBoundingClientRect();
-        let testTop = ( window.innerHeight - rect.top > pixelsShowing ) ?
-            true :
-            false;
+        let math = window.innerHeight - rect.top;
+        let testTop = ( math > pixelsShowing ) ? true : false;
         let testBottom = ( rect.bottom > pixelsShowing ) ? true : false;
         return ( testTop && testBottom ) ? "yes" : "no";
     },
-    getAnchorButtonStatus( button ) {
-        const status = button.getAttribute( "aria-pressed" );
-        return ( status === "true" ) ? "on" : "off";
-    },
-    getButtonStatus( button ) {
-        return ( button.getAttribute( "aria-pressed" ) === "true" ) ?
-        "on" :
-        "off";
-    },
     getElementHeight( element ) {
         let rect = element.getBoundingClientRect();
-        return ( rect.top > rect.bottom ) ?
-            rect.top - rect.bottom :
-            rect.bottom - rect.top;
+        let math1 = rect.top - rect.bottom;
+        let math2 = rect.bottom - rect.top;
+        return ( rect.top > rect.bottom ) ? math1 : math2;
     },
-    getKeystrokeNames( e ) {
-        let k = ( e.key === "ArrowUp" ) ? "up" : "not found";
-        k = ( e.key === "ArrowDown" ) ? "down" : k;
-        k = ( e.key === "ArrowLeft" ) ? "left" : k;
-        k = ( e.key === "ArrowRight" ) ? "right" : k;
-        k = (
-            e.key === " " ||
-            e.key === "Spacebar" ||
-            e.code === "Space"
-        ) ?
-            "spacebar" :
-            k;
-        k = ( e.key === "Enter" ) ? "enter" : k;
-        k = ( e.key === "Home" ) ? "home" : k;
-        k = ( e.key === "End" ) ? "end" : k;
-        k = ( e.key === "Escape" ) ? "escape" : k;
-        return k;
+    getNextInArray( args ) {
+        return ( args.pos + 1 < args.buttons.length ) ? args.pos + 1 : 0;
     },
-    getNextInArray( currentPosition, array ) {
-        currentPosition = Number( currentPosition );
-        return ( currentPosition + 1 < array.length ) ? currentPosition + 1 : 0;
+    nn( content ) { // Not Null
+        return ( content !== null ) ? true : false;
     },
-    nn( element ) { // Not Null
-        return ( element !== null ) ? true : false;
-    },
-    ns( array ) { // Nodelist Set
-        return ( array && array.length > 0 ) ? true : false;
-    },
-    stringContains( haystack, needle ) {
-        return ( haystack.indexOf( needle ) !== -1 ) ? "yes" : "no";
+    ns( nl ) { // Nodelist Set
+        return ( nl && nl.length > 0 ) ? true : false;
     },
     toggleButton( button, action ) {
-        if ( action === "on" || action === "off") {
-            action = ( action === "on" ) ? true : false;
-        } else if ( action === "toggle" ) {
-            action = (
-                button.getAttribute( "aria-pressed" ) === "true"
-            ) ?
-            false :
-            true;
-        }
-        button.setAttribute( "aria-pressed", action );
+        let boolean = ( this.buttonIsOn( button ) ) ? false : true;
+        boolean = ( action === "toggle" ) ? boolean : action;
+        button.setAttribute( "aria-pressed", boolean );
     },
     toggleCSS( element, action, css ) {
-        if ( action === "add" ) {
-            element.classList.add( css );
-        } else if ( action === "remove" ) {
-            element.classList.remove( css );
-        } else if (action === "toggle" ) {
-          element.classList.toggle( css );
-        }
+        element.classList[action]( css );
     }
 };
 
