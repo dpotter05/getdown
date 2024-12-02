@@ -1,0 +1,128 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "create-block/getdown",
+  "version": "0.1.0",
+  "title": "Get Down Polaroid Slider",
+  "category": "widgets",
+  "icon": "format-gallery",
+  "description": "This custom Gutenberg block adds a lightweight slider with an option to turn your slides into polaroid pictures.",
+  "example": {},
+  "supports": {
+    "html": false
+  },
+  "textdomain": "getdown",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
+  "attributes": {
+    "polaroid_style": {
+      "type": "string",
+      "source": "attribute",
+      "selector": "#getdown-container",
+      "attribute": "data-polaroid_style",
+      "default": "false"
+    },
+    "pause_on_scroll": {
+      "type": "string",
+      "source": "attribute",
+      "selector": "#getdown-container",
+      "attribute": "data-pause_on_scroll",
+      "default": "false"
+    },
+    "pause_when_viewing_another_tab": {
+      "type": "string",
+      "source": "attribute",
+      "selector": "#getdown-container",
+      "attribute": "data-pause_when_viewing_another_tab",
+      "default": "false"
+    },
+    "select_entry": {
+      "type": "number",
+      "default": 0
+    },
+    "last_select_entry": {
+      "type": "string",
+      "default": "last_select_entry"
+    },
+    "toggle_editor": {
+      "type": "boolean",
+      "default": false
+    },
+    "toggle_polaroid_style_width": {
+      "type": "boolean",
+      "default": false
+    },
+    "toggle_text": {
+      "type": "boolean",
+      "default": false
+    },
+    "toggle_change_slides": {
+      "type": "boolean",
+      "default": false
+    },
+    "images": {
+      "type": "array",
+      "source": "query",
+      "selector": "img.getdown-image",
+      "query": {
+        "url": {
+          "type": "string",
+          "source": "attribute",
+          "attribute": "src"
+        },
+        "alt": {
+          "type": "string",
+          "source": "attribute",
+          "attribute": "alt"
+        },
+        "message": {
+          "type": "string",
+          "source": "attribute",
+          "attribute": "data-message"
+        },
+        "duration": {
+          "type": "number",
+          "source": "attribute",
+          "attribute": "data-duration"
+        },
+        "data_id": {
+          "type": "string",
+          "source": "attribute",
+          "attribute": "data-id"
+        }
+      },
+      "default": [
+        {
+          "url": "/wp-content/plugins/getdown/assets/slide1.webp",
+          "alt": "DJ performing 1",
+          "message": "1 - Do a little dance",
+          "duration": "4000",
+          "data_id": "0"
+        },
+        {
+          "url": "/wp-content/plugins/getdown/assets/slide2.webp",
+          "alt": "DJ performing 2",
+          "message": "2 - Make a little love",
+          "duration": "4000",
+          "data_id": "0"
+        },
+        {
+          "url": "/wp-content/plugins/getdown/assets/slide3.webp",
+          "alt": "Crowd cheering at a concert 1",
+          "message": "3 - Get down tonight",
+          "duration": "4000",
+          "data_id": "0"
+        },
+        {
+          "url": "/wp-content/plugins/getdown/assets/slide4.webp",
+          "alt": "Crowd cheering at a concert 2",
+          "message": "4 - Get down tonight",
+          "duration": "4000",
+          "data_id": "0"
+        }
+      ]
+    }
+  }
+}

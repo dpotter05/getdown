@@ -1,1 +1,0 @@
-Please see https://github.com/dpotter05/getdown for instructions, examples, and demos.
